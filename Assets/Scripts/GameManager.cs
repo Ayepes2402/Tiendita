@@ -1,38 +1,36 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    private Cliente clienteActual;
+    private ClienteGenerator generador;
+    private UIManager uiManager;
     private Inventario inventario;
     private VentaService ventaService;
     private EventoAleatorio eventoSistema;
 
-    public int dinero = 0;
+    public int dinero = 0; // se analizará posteriormente la posibilidad de serializar las variables [SerializeField]
     public int dia = 1;
     public int deuda = 200;
 
     void Start()
     {
-        // Crear productos iniciales
         List<Producto> productos = new List<Producto>();
 
         productos.Add(new Producto("pan", 10, 10));
         productos.Add(new Producto("leche", 12, 5));
         productos.Add(new Producto("huevos", 15, 6));
 
-        // Crear sistemas del juego
         inventario = new Inventario(productos);
         ventaService = new VentaService(inventario);
         eventoSistema = new EventoAleatorio();
+        generador = new ClienteGenerator();
+        uiManager = FindObjectOfType<UIManager>();
 
-        Debug.Log("Comienza el día " + dia);
+        dinero = 50;
 
-        // CLIENTE DE PRUEBA
-        Cliente clientePrueba = new Cliente(TipoCliente.Normal, "pan", 20);
-
-        AtenderCliente(clientePrueba);
-
-        FinDelDia();
+        GenerarNuevoCliente();
     }
 
     public void AtenderCliente(Cliente cliente)
@@ -56,7 +54,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Fin del día " + dia);
 
-        // Generar evento aleatorio
+        
         TipoEvento evento = eventoSistema.GenerarEvento();
 
         ProcesarEvento(evento);
@@ -103,5 +101,45 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("Perdiste el juego, no pudiste pagar la deuda");
         }
+    }
+
+    public void GenerarNuevoCliente()
+    {
+        clienteActual = generador.GenerarCliente();
+
+        Debug.Log("Cliente pide: " + clienteActual.ProductoPedido);
+
+        uiManager.MostrarCliente(clienteActual);
+        uiManager.ActualizarUI();
+    }
+
+    public void BotonVender()
+    {
+        bool venta = ventaService.RealizarVenta(clienteActual);
+
+        if (venta)
+        {
+            Producto producto = inventario.ObtenerProducto(clienteActual.ProductoPedido);
+            dinero += producto.Precio;
+
+            Debug.Log("Venta exitosa");
+        }
+        else
+        {
+            Debug.Log("No se pudo vender");
+        }
+
+        SiguienteCliente();
+    }
+
+    public void BotonRechazar()
+    {
+        Debug.Log("Cliente rechazado");
+        SiguienteCliente();
+    }
+
+    void SiguienteCliente()
+    {
+        GenerarNuevoCliente();
     }
 }
