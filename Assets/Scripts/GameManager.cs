@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     private VentaService ventaService;
     private EventoAleatorio eventoSistema;
 
-    public int dinero = 0; // se analizará posteriormente la posibilidad de serializar las variables [SerializeField]
+    public int dinero = 0; // se analizarÃ¡ posteriormente la posibilidad de serializar las variables [SerializeField]
     public int dia = 1;
     public int deuda = 200;
 
@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour
             dinero += producto.Precio;
 
             Debug.Log("Venta realizada de " + cliente.ProductoPedido);
+            uiManager.ActualizarUI();
         }
         else
         {
@@ -52,9 +53,8 @@ public class GameManager : MonoBehaviour
 
     public void FinDelDia()
     {
-        Debug.Log("Fin del día " + dia);
+        Debug.Log("Fin del dÃ­a " + dia);
 
-        
         TipoEvento evento = eventoSistema.GenerarEvento();
 
         ProcesarEvento(evento);
@@ -67,8 +67,10 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Comienza el día " + dia);
+            Debug.Log("Comienza el dÃ­a " + dia);
         }
+
+        uiManager.ActualizarUI();
     }
 
     private void ProcesarEvento(TipoEvento evento)
@@ -77,16 +79,16 @@ public class GameManager : MonoBehaviour
         {
             case TipoEvento.Robo:
                 dinero -= 20;
-                Debug.Log("Un ladrón robó dinero de la caja");
+                Debug.Log("Un ladrÃ³n robÃ³ dinero de la caja");
                 break;
 
             case TipoEvento.Propina:
                 dinero += 10;
-                Debug.Log("Un cliente dejó propina");
+                Debug.Log("Un cliente dejÃ³ propina");
                 break;
 
             case TipoEvento.Nada:
-                Debug.Log("No ocurrió ningún evento hoy");
+                Debug.Log("No ocurriÃ³ ningÃºn evento hoy");
                 break;
         }
     }
@@ -136,6 +138,11 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Cliente rechazado");
         SiguienteCliente();
+    }
+
+    public Inventario ObtenerInventario()
+    {
+        return inventario;
     }
 
     void SiguienteCliente()

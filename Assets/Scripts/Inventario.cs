@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-
-using UnityEngine;
-
-
+using System.Collections.Generic;
 
 public class Inventario
 {
@@ -38,5 +34,33 @@ public class Inventario
     public List<Producto> ObtenerProductos()
     {
         return productos;
+    }
+
+    public List<Producto> ObtenerProductosPorCategoria(CategoriaProducto categoria)
+    {
+        List<Producto> productosFiltrados = new List<Producto>();
+
+        foreach (Producto producto in productos)
+        {
+            if (producto.Categoria == categoria)
+            {
+                productosFiltrados.Add(producto);
+            }
+        }
+
+        return productosFiltrados;
+    }
+
+    public bool TieneProductosEnCategoria(CategoriaProducto categoria)
+    {
+        foreach (Producto producto in productos)
+        {
+            if (producto.Categoria == categoria && producto.HayStock())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

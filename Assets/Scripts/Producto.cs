@@ -1,5 +1,3 @@
-﻿using System;
-
 using UnityEngine;
 
 public class Producto
@@ -7,12 +5,19 @@ public class Producto
     public string Nombre { get; private set; }
     public int Precio { get; private set; }
     public int Cantidad { get; private set; }
+    public CategoriaProducto Categoria { get; private set; }
 
     public Producto(string nombre, int precio, int cantidad)
+        : this(nombre, precio, cantidad, CategoriaProducto.Otro)
+    {
+    }
+
+    public Producto(string nombre, int precio, int cantidad, CategoriaProducto categoria)
     {
         Nombre = nombre;
         Precio = precio;
         Cantidad = cantidad;
+        Categoria = categoria;
     }
 
     public bool HayStock()
@@ -26,5 +31,10 @@ public class Producto
         {
             Cantidad--;
         }
+    }
+
+    public bool EsDeCategoria(CategoriaProducto categoria)
+    {
+        return Categoria == categoria;
     }
 }
