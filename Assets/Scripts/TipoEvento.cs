@@ -4,5 +4,10 @@ public enum TipoEvento
 {
     Robo,
     Propina,
-    Nada
+    Nada,
+    ClienteMolestoPorFaltaDeStock,
+    DescuentoPorProductoPorVencer,
+    InspeccionSanitaria,
+    BonificacionProveedor,
+    MultaPorDesorden
 }

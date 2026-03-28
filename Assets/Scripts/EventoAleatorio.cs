@@ -1,25 +1,50 @@
-﻿using System;
-
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class EventoAleatorio
 {
-    private Random random;
-
-    public EventoAleatorio()
+    public TipoEvento GenerarEvento(Inventario inventario)
     {
-        random = new Random();
-    }
+        List<TipoEvento> eventosPosibles = new List<TipoEvento>
+        {
+            TipoEvento.Robo,
+            TipoEvento.Propina,
+            TipoEvento.Nada,
+            TipoEvento.InspeccionSanitaria,
+            TipoEvento.MultaPorDesorden
+        };
 
-    public TipoEvento GenerarEvento()
-    {
-        int valor = random.Next(0, 3);
+        if (inventario != null)
+        {
+            bool hayProductoConPocoStock = false;
+            bool hayProductoConMuchoStock = false;
 
-        if (valor == 0)
-            return TipoEvento.Robo;
+            foreach (Producto producto in inventario.ObtenerProductos())
+            {
+                if (producto.Cantidad > 0 && producto.Cantidad <= 2)
+                {
+                    hayProductoConPocoStock = true;
+                }
 
-        if (valor == 1)
-            return TipoEvento.Propina;
+                if (producto.Cantidad >= 5)
+                {
+                    hayProductoConMuchoStock = true;
+                }
+            }
 
-        return TipoEvento.Nada;
+            if (hayProductoConPocoStock)
+            {
+                eventosPosibles.Add(TipoEvento.ClienteMolestoPorFaltaDeStock);
+            }
+
+            if (hayProductoConMuchoStock)
+            {
+                eventosPosibles.Add(TipoEvento.DescuentoPorProductoPorVencer);
+                eventosPosibles.Add(TipoEvento.BonificacionProveedor);
+            }
+        }
+
+        int indice = Random.Range(0, eventosPosibles.Count);
+        return eventosPosibles[indice];
     }
 }

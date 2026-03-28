@@ -8,21 +8,55 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI textoDinero;
     public TextMeshProUGUI textoDia;
     public TextMeshProUGUI textoInventario;
+    public TextMeshProUGUI textoEstado;
+    public TextMeshProUGUI textoAmonestaciones;
+    public TextMeshProUGUI textoMetaDiaria;
+    public GameObject panelGameOver;
+    public TextMeshProUGUI textoGameOver;
 
     private GameManager gameManager;
 
     void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
+
+        if (panelGameOver != null)
+        {
+            panelGameOver.SetActive(false);
+        }
+
         ActualizarUI();
     }
 
     public void MostrarCliente(Cliente cliente)
     {
-        if (textoCliente != null)
+        if (textoCliente != null && cliente != null)
         {
             textoCliente.text = "Cliente: Quiero " + cliente.ProductoPedido;
         }
+    }
+
+    public void MostrarEstado(string mensaje)
+    {
+        if (textoEstado != null)
+        {
+            textoEstado.text = mensaje;
+        }
+    }
+
+    public void MostrarGameOver(string mensaje)
+    {
+        if (panelGameOver != null)
+        {
+            panelGameOver.SetActive(true);
+        }
+
+        if (textoGameOver != null)
+        {
+            textoGameOver.text = mensaje + "\nPresiona Restart para volver a jugar.";
+        }
+
+        MostrarEstado(mensaje);
     }
 
     public void ActualizarUI()
@@ -44,9 +78,21 @@ public class UIManager : MonoBehaviour
 
         if (textoDia != null)
         {
-            textoDia.text = "Día: " + gameManager.dia;
+            textoDia.text = "Dia: " + gameManager.dia;
         }
 
+        if (textoAmonestaciones != null)
+        {
+            textoAmonestaciones.text = "Amonestaciones: " + gameManager.amonestaciones + "/" + gameManager.maxAmonestaciones;
+        }
+
+        if (textoMetaDiaria != null)
+        {
+            textoMetaDiaria.text = "Meta diaria: $" + gameManager.ObtenerDineroGanadoEnElDia() +
+                                   "/$" + gameManager.ObtenerMetaMinimaDiaria();
+        }
+
+        MostrarEstado(gameManager.ObtenerUltimoMensajeEvento());
         ActualizarInventarioUI();
     }
 
@@ -74,5 +120,13 @@ public class UIManager : MonoBehaviour
         }
 
         textoInventario.text = builder.ToString();
+    }
+
+    public void BotonRestart()
+    {
+        if (gameManager != null)
+        {
+            gameManager.ReiniciarJuego();
+        }
     }
 }
