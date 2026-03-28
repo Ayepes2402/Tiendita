@@ -1,3 +1,5 @@
+( EL EJECUTABLE ESTA COMPRIMIDO ACA)
+
 TIENDITA
 
 - Alejandro Gonzalez David
