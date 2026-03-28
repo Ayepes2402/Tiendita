@@ -1,6 +1,7 @@
 using System.Text;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -11,8 +12,14 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI textoEstado;
     public TextMeshProUGUI textoAmonestaciones;
     public TextMeshProUGUI textoMetaDiaria;
+    public TextMeshProUGUI textoEventoDelDia;
+    public TextMeshProUGUI textoAvisoDia;
+    public GameObject panelCambioDia;
+    public TextMeshProUGUI textoCambioDia;
     public GameObject panelGameOver;
     public TextMeshProUGUI textoGameOver;
+    public Image imagenCliente;
+    public Sprite[] spritesClientes;
 
     private GameManager gameManager;
 
@@ -25,14 +32,40 @@ public class UIManager : MonoBehaviour
             panelGameOver.SetActive(false);
         }
 
+        if (panelCambioDia != null)
+        {
+            panelCambioDia.SetActive(false);
+        }
+
         ActualizarUI();
     }
 
     public void MostrarCliente(Cliente cliente)
     {
-        if (textoCliente != null && cliente != null)
+        if (textoCliente != null)
         {
-            textoCliente.text = "Cliente: Quiero " + cliente.ProductoPedido;
+            if (cliente == null)
+            {
+                textoCliente.text = "No hay cliente actual";
+            }
+            else
+            {
+                textoCliente.text = cliente.Nombre + " - " + cliente.Personalidad + "\n\"" + cliente.FrasePedido + "\"";
+            }
+        }
+
+        if (imagenCliente != null)
+        {
+            if (cliente != null && spritesClientes != null &&
+                cliente.SpriteIndex >= 0 && cliente.SpriteIndex < spritesClientes.Length)
+            {
+                imagenCliente.enabled = true;
+                imagenCliente.sprite = spritesClientes[cliente.SpriteIndex];
+            }
+            else
+            {
+                imagenCliente.enabled = false;
+            }
         }
     }
 
@@ -41,6 +74,44 @@ public class UIManager : MonoBehaviour
         if (textoEstado != null)
         {
             textoEstado.text = mensaje;
+        }
+    }
+
+    public void MostrarEventoDelDia(string mensaje)
+    {
+        if (textoEventoDelDia != null)
+        {
+            textoEventoDelDia.text = "Evento del día: " + mensaje;
+        }
+    }
+
+    public void MostrarAvisoDia(string mensaje)
+    {
+        if (textoAvisoDia != null)
+        {
+            textoAvisoDia.text = mensaje;
+        }
+    }
+
+
+    public void MostrarPanelCambioDia(string mensaje)
+    {
+        if (panelCambioDia != null)
+        {
+            panelCambioDia.SetActive(true);
+        }
+
+        if (textoCambioDia != null)
+        {
+            textoCambioDia.text = mensaje;
+        }
+    }
+
+    public void OcultarPanelCambioDia()
+    {
+        if (panelCambioDia != null)
+        {
+            panelCambioDia.SetActive(false);
         }
     }
 
@@ -78,7 +149,7 @@ public class UIManager : MonoBehaviour
 
         if (textoDia != null)
         {
-            textoDia.text = "Dia: " + gameManager.dia;
+            textoDia.text = "Día: " + gameManager.dia;
         }
 
         if (textoAmonestaciones != null)
@@ -88,11 +159,13 @@ public class UIManager : MonoBehaviour
 
         if (textoMetaDiaria != null)
         {
-            textoMetaDiaria.text = "Meta diaria: $" + gameManager.ObtenerDineroGanadoEnElDia() +
-                                   "/$" + gameManager.ObtenerMetaMinimaDiaria();
+            textoMetaDiaria.text = "Clientes atendidos: " + gameManager.ObtenerClientesAtendidosHoy() +
+                                   "/" + gameManager.ObtenerClientesPorDia() +
+                                   " | Ganado hoy: $" + gameManager.ObtenerDineroGanadoEnElDia();
         }
 
         MostrarEstado(gameManager.ObtenerUltimoMensajeEvento());
+        MostrarEventoDelDia(gameManager.ObtenerEventoDelDiaActual());
         ActualizarInventarioUI();
     }
 
@@ -120,6 +193,14 @@ public class UIManager : MonoBehaviour
         }
 
         textoInventario.text = builder.ToString();
+    }
+
+    public void BotonContinuarDia()
+    {
+        if (gameManager != null)
+        {
+            gameManager.BotonContinuarDia();
+        }
     }
 
     public void BotonRestart()
