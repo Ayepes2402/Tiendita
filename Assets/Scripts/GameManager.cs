@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     private Inventario inventario;
     private VentaService ventaService;
     private EventoAleatorio eventoSistema;
+    private ReglaGobierno reglaDelDia;
 
     private List<Cliente> clientesTotales;
     private List<Cliente> clientesDelDia;
@@ -60,6 +61,7 @@ public class GameManager : MonoBehaviour
         diasMaximos = 2;
         dia = 1;
         amonestaciones = 0;
+        maxAmonestaciones = 3;
         dineroGanadoEnElDia = 0;
         juegoTerminado = false;
         ultimoMensajeEvento = "La tienda abrió.";
@@ -90,69 +92,19 @@ public class GameManager : MonoBehaviour
 
     private void AplicarEventoDelDia(bool esPrimerDia)
     {
-        TipoEvento evento = eventoSistema.GenerarEvento(inventario);
-        string contexto = esPrimerDia ? "al iniciar el juego" : "al iniciar el día " + dia;
+        string productoProhibido = eventoSistema.GenerarProductoProhibido(inventario);
+        reglaDelDia = new ReglaGobierno(productoProhibido);
 
-        switch (evento)
+        if (string.IsNullOrEmpty(productoProhibido))
         {
-            case TipoEvento.Robo:
-                dinero -= 20;
-                eventoDelDiaActual = "Robo en la tienda " + contexto + ". Perdiste $20.";
-                break;
-
-            case TipoEvento.Propina:
-                dinero += 10;
-                eventoDelDiaActual = "Llegó una buena racha " + contexto + ". Ganaste $10 extra.";
-                break;
-
-            case TipoEvento.Nada:
-                eventoDelDiaActual = "Hoy no ocurrió nada especial.";
-                break;
-
-            case TipoEvento.ClienteMolestoPorFaltaDeStock:
-                amonestaciones++;
-                dinero -= 15;
-                eventoDelDiaActual = "Clientes molestos por bajo stock. 1 amonestación y pierdes $15.";
-                break;
-
-            case TipoEvento.DescuentoPorProductoPorVencer:
-                dinero -= 8;
-                eventoDelDiaActual = "Tocó rematar productos por vencer. Pierdes $8.";
-                break;
-
-            case TipoEvento.InspeccionSanitaria:
-                if (InventarioVacio())
-                {
-                    amonestaciones++;
-                    dinero -= 25;
-                    eventoDelDiaActual = "Inspección sanitaria: estantes vacíos. 1 amonestación y multa de $25.";
-                }
-                else
-                {
-                    eventoDelDiaActual = "Inspección sanitaria superada sin problemas.";
-                }
-                break;
-
-            case TipoEvento.BonificacionProveedor:
-                dinero += 12;
-                eventoDelDiaActual = "Bonificación del proveedor. Ganaste $12.";
-                break;
-
-            case TipoEvento.MultaPorDesorden:
-                dinero -= 10;
-                eventoDelDiaActual = "Multa por desorden en la tienda. Perdiste $10.";
-                break;
+            eventoDelDiaActual = "Hoy no hay restricción de venta.";
+        }
+        else
+        {
+            eventoDelDiaActual = "Hoy no puedes vender " + productoProhibido + ". Si lo vendes, recibes una amonestación.";
         }
 
         ultimoMensajeEvento = eventoDelDiaActual;
-
-        if (amonestaciones >= maxAmonestaciones)
-        {
-            FinJuego(true, "Acumulaste demasiadas amonestaciones.");
-            return;
-        }
-
-        VerificarQuiebra();
     }
 
     private void MostrarClienteActual()
@@ -206,24 +158,27 @@ public class GameManager : MonoBehaviour
             Producto producto = inventario.ObtenerProducto(clienteActual.ProductoPedido);
             dinero += producto.Precio;
             dineroGanadoEnElDia += producto.Precio;
-            ultimoMensajeEvento = clienteActual.Nombre + " compró " + clienteActual.ProductoPedido +
-                                  ". Ganaste $" + producto.Precio + ".";
+
+            if (reglaDelDia != null && !reglaDelDia.PuedeVender(clienteActual.ProductoPedido))
+            {
+                SumarAmonestacion("Vendiste " + clienteActual.ProductoPedido +
+                                  " aunque hoy estaba prohibido. Ganaste $" + producto.Precio + ".", 0);
+            }
+            else
+            {
+                ultimoMensajeEvento = clienteActual.Nombre + " compró " + clienteActual.ProductoPedido +
+                                      ". Ganaste $" + producto.Precio + ".";
+            }
+
             Debug.Log(ultimoMensajeEvento);
         }
         else
         {
-            amonestaciones++;
-            dinero -= 5;
-            ultimoMensajeEvento = "No se pudo vender a " + clienteActual.Nombre +
-                                  ". Recibiste 1 amonestación y perdiste $5.";
+            SumarAmonestacion("No se pudo vender a " + clienteActual.Nombre + ".", 5);
             Debug.Log(ultimoMensajeEvento);
         }
 
-        if (amonestaciones >= maxAmonestaciones)
-        {
-            FinJuego(true, "Acumulaste demasiadas amonestaciones.");
-        }
-        else
+        if (!juegoTerminado)
         {
             VerificarQuiebra();
         }
@@ -243,7 +198,7 @@ public class GameManager : MonoBehaviour
 
         clientesAtendidosHoy++;
         dinero -= 2;
-        ultimoMensajeEvento = clienteActual.Nombre + " se fue bravo. Perdiste $2 por rechazarlo.";
+        ultimoMensajeEvento = clienteActual.Nombre + " fue rechazado. Perdiste $2, pero no recibiste amonestación.";
         Debug.Log(ultimoMensajeEvento);
 
         VerificarQuiebra();
@@ -276,14 +231,30 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if (dia >= diasMaximos)
+        if (clientesAtendidosHoy >= clientesPorDia && dineroGanadoEnElDia < metaMinimaDiaria)
         {
-            FinJuego(false, "Terminaste los " + diasMaximos + " días disponibles.");
+            FinJuego(true, "No cumpliste la meta mínima del día de $" + metaMinimaDiaria +
+                          ". Solo ganaste $" + dineroGanadoEnElDia + " en los 5 clientes.");
             ActualizarUICompleta();
             return;
         }
 
-        string mensajeCambioDia = "Se acabó el día " + dia + ". Pasamos al día " + (dia + 1) + ".";
+        if (dineroGanadoEnElDia < metaMinimaDiaria)
+        {
+            ultimoMensajeEvento = "No puedes pasar de día todavía. Debes ganar al menos $" +
+                                  metaMinimaDiaria + " y solo llevas $" + dineroGanadoEnElDia + ".";
+            ActualizarUICompleta();
+            return;
+        }
+
+        if (dia >= diasMaximos)
+        {
+            FinJuego(false, "Cumpliste la meta y terminaste los " + diasMaximos + " días disponibles.");
+            ActualizarUICompleta();
+            return;
+        }
+
+        string mensajeCambioDia = "Se acabó el día " + dia + ". Cumpliste la meta. Pasamos al día " + (dia + 1) + ".";
         ultimoMensajeEvento = mensajeCambioDia;
         esperandoContinuarDia = true;
         Debug.Log(mensajeCambioDia);
@@ -321,8 +292,36 @@ public class GameManager : MonoBehaviour
         if (juegoTerminado)
             return;
 
-        ultimoMensajeEvento = "Ahora el día termina automáticamente al atender 5 clientes.";
+        ultimoMensajeEvento = "Solo puedes pasar el día si cumples la meta mínima. Si no la cumples al llegar a 5 clientes, pierdes automáticamente.";
         ActualizarUICompleta();
+    }
+
+    private void SumarAmonestacion(string motivo, int penalizacionDinero)
+    {
+        amonestaciones++;
+        dinero -= penalizacionDinero;
+
+        if (penalizacionDinero > 0)
+        {
+            ultimoMensajeEvento = motivo + " Recibiste 1 amonestación y perdiste $" + penalizacionDinero + ".";
+        }
+        else
+        {
+            ultimoMensajeEvento = motivo + " Recibiste 1 amonestación.";
+        }
+
+        if (amonestaciones >= maxAmonestaciones)
+        {
+            FinJuego(true, "Acumulaste demasiadas amonestaciones.");
+            return;
+        }
+
+        if (juegoTerminado)
+        {
+            return;
+        }
+
+        VerificarQuiebra();
     }
 
     private bool InventarioVacio()

@@ -50,7 +50,7 @@ public class UIManager : MonoBehaviour
             }
             else
             {
-                textoCliente.text = cliente.Nombre + " - " + cliente.Personalidad + "\n\"" + cliente.FrasePedido + "\"";
+                textoCliente.text = cliente.Nombre + " - " + cliente.FrasePedido + "\"";
             }
         }
 
@@ -92,7 +92,6 @@ public class UIManager : MonoBehaviour
             textoAvisoDia.text = mensaje;
         }
     }
-
 
     public void MostrarPanelCambioDia(string mensaje)
     {
@@ -159,9 +158,10 @@ public class UIManager : MonoBehaviour
 
         if (textoMetaDiaria != null)
         {
-            textoMetaDiaria.text = "Clientes atendidos: " + gameManager.ObtenerClientesAtendidosHoy() +
-                                   "/" + gameManager.ObtenerClientesPorDia() +
-                                   " | Ganado hoy: $" + gameManager.ObtenerDineroGanadoEnElDia();
+            textoMetaDiaria.text = "Meta diaria: $" + gameManager.ObtenerDineroGanadoEnElDia() +
+                                   "/$" + gameManager.ObtenerMetaMinimaDiaria() +
+                                   " | Clientes: " + gameManager.ObtenerClientesAtendidosHoy() +
+                                   "/" + gameManager.ObtenerClientesPorDia();
         }
 
         MostrarEstado(gameManager.ObtenerUltimoMensajeEvento());
@@ -193,6 +193,22 @@ public class UIManager : MonoBehaviour
         }
 
         textoInventario.text = builder.ToString();
+    }
+
+    public void BotonVender()
+    {
+        if (gameManager != null)
+        {
+            gameManager.BotonVender();
+        }
+    }
+
+    public void BotonRechazar()
+    {
+        if (gameManager != null)
+        {
+            gameManager.BotonRechazar();
+        }
     }
 
     public void BotonContinuarDia()
