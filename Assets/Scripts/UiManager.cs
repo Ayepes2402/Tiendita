@@ -195,13 +195,13 @@ public class UIManager : MonoBehaviour
         textoInventario.text = builder.ToString();
     }
 
-    public void BotonVender()
-    {
-        if (gameManager != null)
-        {
-            gameManager.BotonVender();
-        }
-    }
+    //public void BotonVender()
+    //{
+    //    if (gameManager != null)
+    //    {
+    //        gameManager.IntentarVender();
+    //    }
+    //}
 
     public void BotonRechazar()
     {

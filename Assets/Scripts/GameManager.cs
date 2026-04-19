@@ -137,7 +137,7 @@ public class GameManager : MonoBehaviour
             return;
 
         clienteActual = cliente;
-        BotonVender();
+     //   BotonVender();
     }
 
     public void GenerarNuevoCliente()
@@ -145,38 +145,50 @@ public class GameManager : MonoBehaviour
         MostrarClienteActual();
     }
 
-    public void BotonVender()
+    public void IntentarVender(string productoEntregado)
     {
         if (juegoTerminado || esperandoContinuarDia || clienteActual == null)
             return;
 
-        bool venta = ventaService.RealizarVenta(clienteActual);
-        clientesAtendidosHoy++;
-
-        if (venta)
+        // 1. Validar si le empujó la mercancía que no era
+        if (productoEntregado != clienteActual.ProductoPedido)
         {
-            Producto producto = inventario.ObtenerProducto(clienteActual.ProductoPedido);
-            dinero += producto.Precio;
-            dineroGanadoEnElDia += producto.Precio;
-
-            if (reglaDelDia != null && !reglaDelDia.PuedeVender(clienteActual.ProductoPedido))
+            SumarAmonestacion("¡Qué chambonada! Le diste " + productoEntregado + " pero el cliente quería " + clienteActual.ProductoPedido + ".", 5);
+        }
+        // 2. Validar si coronó pero el producto estaba prohibido por el gobierno
+        else if (reglaDelDia != null && !reglaDelDia.PuedeVender(productoEntregado))
+        {
+            bool venta = ventaService.RealizarVenta(clienteActual);
+            if (venta)
             {
-                SumarAmonestacion("Vendiste " + clienteActual.ProductoPedido +
-                                  " aunque hoy estaba prohibido. Ganaste $" + producto.Precio + ".", 0);
+                Producto producto = inventario.ObtenerProducto(productoEntregado);
+                dinero += producto.Precio;
+                dineroGanadoEnElDia += producto.Precio;
+
+                // Le da la plata, pero le clava la multa por torcido
+                SumarAmonestacion("Vendiste " + productoEntregado + " aunque estaba prohibido por el gobierno. Ganaste $" + producto.Precio + " pero te llevas la multa.", 0);
+            }
+        }
+        // 3. Venta melita y legal
+        else
+        {
+            bool venta = ventaService.RealizarVenta(clienteActual);
+            if (venta)
+            {
+                Producto producto = inventario.ObtenerProducto(productoEntregado);
+                dinero += producto.Precio;
+                dineroGanadoEnElDia += producto.Precio;
+
+                ultimoMensajeEvento = clienteActual.Nombre + " compró " + productoEntregado + ". Ganaste $" + producto.Precio + ".";
+                Debug.Log(ultimoMensajeEvento);
             }
             else
             {
-                ultimoMensajeEvento = clienteActual.Nombre + " compró " + clienteActual.ProductoPedido +
-                                      ". Ganaste $" + producto.Precio + ".";
+                SumarAmonestacion("Paila, no se pudo vender a " + clienteActual.Nombre + ".", 5);
             }
+        }
 
-            Debug.Log(ultimoMensajeEvento);
-        }
-        else
-        {
-            SumarAmonestacion("No se pudo vender a " + clienteActual.Nombre + ".", 5);
-            Debug.Log(ultimoMensajeEvento);
-        }
+        clientesAtendidosHoy++;
 
         if (!juegoTerminado)
         {
@@ -197,8 +209,19 @@ public class GameManager : MonoBehaviour
             return;
 
         clientesAtendidosHoy++;
-        dinero -= 2;
-        ultimoMensajeEvento = clienteActual.Nombre + " fue rechazado. Perdiste $2, pero no recibiste amonestación.";
+
+        // Pillamos si el cliente estaba pidiendo una vuelta prohibida
+        if (reglaDelDia != null && !reglaDelDia.PuedeVender(clienteActual.ProductoPedido))
+        {
+            ultimoMensajeEvento = "Bien jugado. Rechazaste a " + clienteActual.Nombre + " porque pedía algo prohibido. Evitaste la multa.";
+            // No restamos plata ni amonestamos porque hizo la vuelta bien
+        }
+        else
+        {
+            // Lo echó sin razón y pedía algo legal. Tome su amonestación.
+            SumarAmonestacion("Echaste a " + clienteActual.Nombre + " por pura pereza. El producto no estaba prohibido.", 2);
+        }
+
         Debug.Log(ultimoMensajeEvento);
 
         VerificarQuiebra();
