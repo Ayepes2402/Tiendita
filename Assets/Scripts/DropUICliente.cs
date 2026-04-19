@@ -17,7 +17,8 @@ public class DropUICliente : MonoBehaviour, IDropHandler
         {
             DragUICategoria categoria = eventData.pointerDrag.GetComponent<DragUICategoria>();
 
-            if (categoria != null && categoria.unidadesDisponibles > 0 && gameManager != null)
+            // ¡PILLE ACÁ EL CAMBIO! Ahora llama a ObtenerUnidadesReales()
+            if (categoria != null && categoria.ObtenerUnidadesReales() > 0 && gameManager != null)
             {
                 // Le pasamos el chisme al GameManager de qué fue lo que le tiraron
                 gameManager.IntentarVender(categoria.nombreProducto);

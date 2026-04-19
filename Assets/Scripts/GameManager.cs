@@ -46,9 +46,9 @@ public class GameManager : MonoBehaviour
     {
         List<Producto> productos = new List<Producto>
         {
-            new Producto("pan", 10, 10, CategoriaProducto.Basico),
-            new Producto("leche", 12, 5, CategoriaProducto.Lacteo),
-            new Producto("huevos", 15, 6, CategoriaProducto.Proteina)
+            new Producto("pan", 20, 6, CategoriaProducto.Basico),
+            new Producto("leche", 25, 5, CategoriaProducto.Lacteo),
+            new Producto("huevos", 30, 5, CategoriaProducto.Proteina)
         };
 
         inventario = new Inventario(productos);
@@ -153,7 +153,9 @@ public class GameManager : MonoBehaviour
         // 1. Validar si le empujó la mercancía que no era
         if (productoEntregado != clienteActual.ProductoPedido)
         {
-            SumarAmonestacion("¡Qué chambonada! Le diste " + productoEntregado + " pero el cliente quería " + clienteActual.ProductoPedido + ".", 5);
+            // ¡PILLE ACÁ! Le pasamos un 0 al final en vez de un 5.
+            // Solo sube la amonestación, no da plata, ni quita plata.
+            SumarAmonestacion("¡Qué chambonada! Le diste " + productoEntregado + " pero el cliente quería " + clienteActual.ProductoPedido + ".", 0);
         }
         // 2. Validar si coronó pero el producto estaba prohibido por el gobierno
         else if (reglaDelDia != null && !reglaDelDia.PuedeVender(productoEntregado))
@@ -165,7 +167,7 @@ public class GameManager : MonoBehaviour
                 dinero += producto.Precio;
                 dineroGanadoEnElDia += producto.Precio;
 
-                // Le da la plata, pero le clava la multa por torcido
+                // Le da la plata, pero le clava la multa por torcido (esta sí le quita 0 plata, como ya estaba)
                 SumarAmonestacion("Vendiste " + productoEntregado + " aunque estaba prohibido por el gobierno. Ganaste $" + producto.Precio + " pero te llevas la multa.", 0);
             }
         }
@@ -184,7 +186,8 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                SumarAmonestacion("Paila, no se pudo vender a " + clienteActual.Nombre + ".", 5);
+                // Ojo, si por alguna razón el inventario interno falla, acá lo dejé con 0 de multa también pa' que sea coherente.
+                SumarAmonestacion("Paila, no se pudo vender a " + clienteActual.Nombre + ".", 0);
             }
         }
 
@@ -249,35 +252,26 @@ public class GameManager : MonoBehaviour
 
     private void CerrarDiaActual()
     {
-        if (juegoTerminado)
-        {
-            return;
-        }
+        if (juegoTerminado) return;
 
-        if (clientesAtendidosHoy >= clientesPorDia && dineroGanadoEnElDia < metaMinimaDiaria)
-        {
-            FinJuego(true, "No cumpliste la meta mínima del día de $" + metaMinimaDiaria +
-                          ". Solo ganaste $" + dineroGanadoEnElDia + " en los 5 clientes.");
-            ActualizarUICompleta();
-            return;
-        }
-
-        if (dineroGanadoEnElDia < metaMinimaDiaria)
-        {
-            ultimoMensajeEvento = "No puedes pasar de día todavía. Debes ganar al menos $" +
-                                  metaMinimaDiaria + " y solo llevas $" + dineroGanadoEnElDia + ".";
-            ActualizarUICompleta();
-            return;
-        }
-
+        // Si ya llegamos al último día de la semana (Día 5)
         if (dia >= diasMaximos)
         {
-            FinJuego(false, "Cumpliste la meta y terminaste los " + diasMaximos + " días disponibles.");
+            // Llegó la hora de pagarle al gota a gota
+            if (dinero >= deuda)
+            {
+                FinJuego(false, "¡Coronaste, perro! Sobreviviste la semana y pagaste los $" + deuda + ". Te quedaron $" + (dinero - deuda) + " libres.");
+            }
+            else
+            {
+                FinJuego(true, "Paila, te torcieron. Terminó la semana y solo juntaste $" + dinero + " de los $" + deuda + " que debías.");
+            }
             ActualizarUICompleta();
             return;
         }
 
-        string mensajeCambioDia = "Se acabó el día " + dia + ". Cumpliste la meta. Pasamos al día " + (dia + 1) + ".";
+        // Si es cualquier otro día, simplemente pasamos al siguiente sin joder con metas
+        string mensajeCambioDia = "Se acabó el día " + dia + ". Pasamos al día " + (dia + 1) + ".";
         ultimoMensajeEvento = mensajeCambioDia;
         esperandoContinuarDia = true;
         Debug.Log(mensajeCambioDia);
@@ -312,10 +306,9 @@ public class GameManager : MonoBehaviour
 
     public void FinDelDia()
     {
-        if (juegoTerminado)
-            return;
+        if (juegoTerminado) return;
 
-        ultimoMensajeEvento = "Solo puedes pasar el día si cumples la meta mínima. Si no la cumples al llegar a 5 clientes, pierdes automáticamente.";
+        ultimoMensajeEvento = "El día solo se acaba cuando atiendas a los " + clientesPorDia + " clientes. ¡A camellar!";
         ActualizarUICompleta();
     }
 

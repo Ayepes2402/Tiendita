@@ -1,14 +1,13 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI; // Necesario pa' manejar la imagen y el texto viejo
+using UnityEngine.UI;
+using TMPro;
 
 public class DragUICategoria : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    [Header("Inventario y Estadísticas")]
-    public int unidadesDisponibles = 10;
-
-    [Tooltip("Arrastre aquí el texto que va a mostrar el numerito")]
-    public Text textoContador;
+    [Header("Configuración Visual")]
+    [Tooltip("Arrastre aquí el texto (TextMeshPro) que va a mostrar el numerito")]
+    public TextMeshProUGUI textoContador;
 
     [Tooltip("Ponga acá EXACTAMENTE el nombre: pan, leche o huevos (en minúscula)")]
     public string nombreProducto = "pan";
@@ -17,36 +16,36 @@ public class DragUICategoria : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     private RectTransform fantasmaRect;
     private Canvas canvasPrincipal;
     private Image miImagen;
+    private GameManager gameManager;
 
     private void Start()
     {
         canvasPrincipal = GetComponentInParent<Canvas>();
         miImagen = GetComponent<Image>();
-        ActualizarTexto();
+        gameManager = FindObjectOfType<GameManager>();
+
+        // Le damos una micro-fracción de segundo pa' que el GameManager 
+        // alcance a crear el Inventario antes de que la repisa intente leerlo.
+        Invoke("ActualizarTextoDesdeBackend", 0.1f);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // Si no hay productos, paila, no deja arrastrar ni mierda
-        if (unidadesDisponibles <= 0) return;
+        // Revisamos el inventario real del sistema antes de dejarlo agarrar nada
+        int unidadesReales = ObtenerUnidadesReales();
+        if (unidadesReales <= 0) return;
 
-        // Creamos un objeto vacío en la pura raíz del Canvas pa' que pase por encima de todo
         fantasma = new GameObject("FantasmaDrag");
         fantasma.transform.SetParent(canvasPrincipal.transform, false);
         fantasma.transform.SetAsLastSibling();
 
-        // Le clonamos la imagen pa' que se vea igualitico al de la repisa
         Image imagenFantasma = fantasma.AddComponent<Image>();
         imagenFantasma.sprite = miImagen.sprite;
-        imagenFantasma.color = new Color(1f, 1f, 1f, 0.7f); // Medio transparente pa' que se note que es un agarre
-
-        // ¡CLAVE! El fantasma no puede tener raycast o bloquea la soltada en el cliente
+        imagenFantasma.color = new Color(1f, 1f, 1f, 0.7f);
         imagenFantasma.raycastTarget = false;
 
         fantasmaRect = fantasma.GetComponent<RectTransform>();
         fantasmaRect.sizeDelta = GetComponent<RectTransform>().sizeDelta;
-
-        // Lo ponemos en la misma posición del mouse al arrancar
         fantasmaRect.position = transform.position;
     }
 
@@ -54,7 +53,6 @@ public class DragUICategoria : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         if (fantasma != null)
         {
-            // Mueve el fantasma, no el objeto original de la repisa
             fantasmaRect.anchoredPosition += eventData.delta / canvasPrincipal.scaleFactor;
         }
     }
@@ -63,33 +61,44 @@ public class DragUICategoria : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     {
         if (fantasma != null)
         {
-            // Suelte donde suelte, el fantasma desaparece. 
-            // El DropUICliente es el que decide si fue venta o no.
             Destroy(fantasma);
         }
     }
 
-    // El cliente llama a esta vuelta si le tiran el producto encima
+    // El DropUICliente sigue llamando a esto, pero ahora solo actualiza la foto
+    // porque el GameManager ya se encargó de restar la mercancía en su código
     public void RestarInventario()
     {
-        if (unidadesDisponibles > 0)
-        {
-            unidadesDisponibles--;
-            ActualizarTexto();
+        ActualizarTextoDesdeBackend();
+    }
 
-            if (unidadesDisponibles <= 0)
-            {
-                // Opcional: Ponga la imagen gris si se quedó sin surtido
-                miImagen.color = new Color(0.5f, 0.5f, 0.5f, 1f);
-            }
+    // Esta es la función que se asoma a la base de datos real
+    public void ActualizarTextoDesdeBackend()
+    {
+        if (gameManager == null) return;
+
+        int unidadesReales = ObtenerUnidadesReales();
+
+        if (textoContador != null)
+        {
+            textoContador.text = unidadesReales.ToString();
+        }
+
+        // Si se nos acabó la vaina en la base de datos, ponemos el dibujo gris
+        if (unidadesReales <= 0)
+        {
+            miImagen.color = new Color(0.5f, 0.5f, 0.5f, 1f);
         }
     }
 
-    private void ActualizarTexto()
+    // Busca el número real metiéndose por las tripas del GameManager
+    public int ObtenerUnidadesReales()
     {
-        if (textoContador != null)
+        if (gameManager != null && gameManager.ObtenerInventario() != null)
         {
-            textoContador.text = unidadesDisponibles.ToString();
+            var producto = gameManager.ObtenerInventario().ObtenerProducto(nombreProducto);
+            if (producto != null) return producto.Cantidad;
         }
+        return 0; // Si no lo encuentra, devuelve 0 por seguridad
     }
 }
