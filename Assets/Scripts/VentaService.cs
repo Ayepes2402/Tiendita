@@ -18,11 +18,10 @@ public class VentaService
 
         Producto producto = inventario.ObtenerProducto(cliente.ProductoPedido);
 
-        if (cliente.Dinero < producto.Precio)
-            return false;
+        // PASARSE POR LAS GUEVAS EL DINERO:
+        // Eliminamos el chequeo de "if (cliente.Dinero < producto.Precio)"
 
         producto.ReducirStock();
-
         return true;
     }
 }

@@ -12,443 +12,188 @@ public class GameManager : MonoBehaviour
     private EventoAleatorio eventoSistema;
     private ReglaGobierno reglaDelDia;
 
-    private List<Cliente> clientesTotales;
     private List<Cliente> clientesDelDia;
     private int indiceClienteActualDelDia;
     private int clientesAtendidosHoy;
-    private string eventoDelDiaActual = "Sin evento";
+    private string eventoDelDiaActual = "";
     private bool esperandoContinuarDia = false;
 
     public int dinero = 0;
     public int dia = 1;
     public int deuda = 200;
 
-    [Header("Estado del juego")]
+    [Header("Configuración")]
     public int dineroInicial = 50;
-    public int diasMaximos = 2;
+    public int diasMaximos = 5; // Forzado a 5 días
     public int amonestaciones = 0;
     public int maxAmonestaciones = 3;
     public int clientesPorDia = 5;
-
-    [Header("Meta diaria")]
     public int metaMinimaDiaria = 20;
-    private int dineroGanadoEnElDia = 0;
 
     private bool juegoTerminado = false;
     private string ultimoMensajeEvento = "";
+    private int dineroGanadoEnElDia = 0;
 
-    void Start()
-    {
-        InicializarJuego();
-    }
+    void Start() { InicializarJuego(); }
 
     private void InicializarJuego()
     {
-        List<Producto> productos = new List<Producto>
-        {
-            new Producto("pan", 20, 6, CategoriaProducto.Basico),
-            new Producto("leche", 25, 5, CategoriaProducto.Lacteo),
-            new Producto("huevos", 30, 5, CategoriaProducto.Proteina)
-        };
-
-        inventario = new Inventario(productos);
+        inventario = new Inventario(new List<Producto> {
+            new Producto("pan", 20, 15, CategoriaProducto.Basico),
+            new Producto("leche", 25, 12, CategoriaProducto.Lacteo),
+            new Producto("huevos", 30, 12, CategoriaProducto.Proteina)
+        });
         ventaService = new VentaService(inventario);
-        eventoSistema = new EventoAleatorio();
         generador = new ClienteGenerator();
         uiManager = FindObjectOfType<UIManager>();
 
         dinero = dineroInicial;
-        diasMaximos = 2;
         dia = 1;
-        amonestaciones = 0;
-        maxAmonestaciones = 3;
-        dineroGanadoEnElDia = 0;
+        diasMaximos = 5; // Aseguramos que sea 5
         juegoTerminado = false;
-        ultimoMensajeEvento = "La tienda abrió.";
-
-        clientesTotales = generador.GenerarPoolDeClientes();
-        PrepararDia(1, true);
-        ActualizarUICompleta();
+        PrepararDia(1);
     }
 
-    private void PrepararDia(int nuevoDia, bool esPrimerDia)
+    private void PrepararDia(int nuevoDia)
     {
         dia = nuevoDia;
         clientesAtendidosHoy = 0;
-        dineroGanadoEnElDia = 0;
-        esperandoContinuarDia = false;
         indiceClienteActualDelDia = 0;
-        clientesDelDia = generador.ObtenerClientesDelDia(clientesTotales, dia, clientesPorDia);
+        amonestaciones = 0; // Reinicio diario de multas
+        esperandoContinuarDia = false;
+        dineroGanadoEnElDia = 0;
 
-        AplicarEventoDelDia(esPrimerDia);
+        List<string> prohibidos = new List<string>();
+        // Configuración de reglas por día
+        if (dia == 1) prohibidos.Add("leche");
+        else if (dia == 2) prohibidos.Add("huevos");
+        else if (dia == 3) prohibidos.Add("pan");
+        else if (dia == 4) { prohibidos.Add("leche"); prohibidos.Add("huevos"); }
+        else if (dia == 5) { prohibidos.Add("huevos"); prohibidos.Add("pan"); }
 
-        if (uiManager != null)
-        {
-            uiManager.MostrarAvisoDia("Comienza el día " + dia);
-        }
+        reglaDelDia = new ReglaGobierno(prohibidos);
+        eventoDelDiaActual = "PROHIBIDO: " + reglaDelDia.ObtenerListaProhibida().ToUpper();
 
-        MostrarClienteActual();
-    }
-
-    private void AplicarEventoDelDia(bool esPrimerDia)
-    {
-        string productoProhibido = eventoSistema.GenerarProductoProhibido(inventario);
-        reglaDelDia = new ReglaGobierno(productoProhibido);
-
-        if (string.IsNullOrEmpty(productoProhibido))
-        {
-            eventoDelDiaActual = "Hoy no hay restricción de venta.";
-        }
-        else
-        {
-            eventoDelDiaActual = "Hoy no puedes vender " + productoProhibido + ". Si lo vendes, recibes una amonestación.";
-        }
-
-        ultimoMensajeEvento = eventoDelDiaActual;
-    }
-
-    private void MostrarClienteActual()
-    {
-        if (juegoTerminado)
-        {
-            return;
-        }
-
-        if (clientesDelDia == null || indiceClienteActualDelDia >= clientesDelDia.Count)
-        {
-            CerrarDiaActual();
-            return;
-        }
-
-        clienteActual = clientesDelDia[indiceClienteActualDelDia];
-        Debug.Log("Cliente del día " + dia + ": " + clienteActual.Nombre + " pide " + clienteActual.ProductoPedido);
+        clientesDelDia = generador.ObtenerClientesDelDia(dia, prohibidos);
 
         if (uiManager != null)
         {
-            uiManager.MostrarCliente(clienteActual);
             uiManager.ActualizarUI();
+            uiManager.MostrarAvisoDia("Día " + dia + ". " + eventoDelDiaActual);
         }
-    }
-
-
-    public void AtenderCliente(Cliente cliente)
-    {
-        if (juegoTerminado || esperandoContinuarDia || cliente == null)
-            return;
-
-        clienteActual = cliente;
-     //   BotonVender();
-    }
-
-    public void GenerarNuevoCliente()
-    {
         MostrarClienteActual();
     }
 
     public void IntentarVender(string productoEntregado)
     {
-        if (juegoTerminado || esperandoContinuarDia || clienteActual == null)
-            return;
+        if (juegoTerminado || esperandoContinuarDia || clienteActual == null) return;
 
-        // 1. Validar si le empujó la mercancía que no era
         if (productoEntregado != clienteActual.ProductoPedido)
         {
-            // ¡PILLE ACÁ! Le pasamos un 0 al final en vez de un 5.
-            // Solo sube la amonestación, no da plata, ni quita plata.
-            SumarAmonestacion("¡Qué chambonada! Le diste " + productoEntregado + " pero el cliente quería " + clienteActual.ProductoPedido + ".", 0);
+            SumarAmonestacion("¡Error de entrega! No era lo que pidió.", 0);
         }
-        // 2. Validar si coronó pero el producto estaba prohibido por el gobierno
-        else if (reglaDelDia != null && !reglaDelDia.PuedeVender(productoEntregado))
+        else if (!reglaDelDia.PuedeVender(productoEntregado))
         {
-            bool venta = ventaService.RealizarVenta(clienteActual);
-            if (venta)
+            if (ventaService.RealizarVenta(clienteActual))
             {
-                Producto producto = inventario.ObtenerProducto(productoEntregado);
-                dinero += producto.Precio;
-                dineroGanadoEnElDia += producto.Precio;
-
-                // Le da la plata, pero le clava la multa por torcido (esta sí le quita 0 plata, como ya estaba)
-                SumarAmonestacion("Vendiste " + productoEntregado + " aunque estaba prohibido por el gobierno. Ganaste $" + producto.Precio + " pero te llevas la multa.", 0);
+                int precio = inventario.ObtenerProducto(productoEntregado).Precio;
+                dinero += precio;
+                dineroGanadoEnElDia += precio;
+                SumarAmonestacion("Venta ilegal de " + productoEntregado + ".", 0);
             }
         }
-        // 3. Venta melita y legal
         else
         {
-            bool venta = ventaService.RealizarVenta(clienteActual);
-            if (venta)
+            if (ventaService.RealizarVenta(clienteActual))
             {
-                Producto producto = inventario.ObtenerProducto(productoEntregado);
-                dinero += producto.Precio;
-                dineroGanadoEnElDia += producto.Precio;
-
-                ultimoMensajeEvento = clienteActual.Nombre + " compró " + productoEntregado + ". Ganaste $" + producto.Precio + ".";
-                Debug.Log(ultimoMensajeEvento);
+                int precio = inventario.ObtenerProducto(productoEntregado).Precio;
+                dinero += precio;
+                dineroGanadoEnElDia += precio;
+                ultimoMensajeEvento = "Venta exitosa.";
             }
-            else
-            {
-                // Ojo, si por alguna razón el inventario interno falla, acá lo dejé con 0 de multa también pa' que sea coherente.
-                SumarAmonestacion("Paila, no se pudo vender a " + clienteActual.Nombre + ".", 0);
-            }
+            else ultimoMensajeEvento = "Sin stock.";
         }
-
-        clientesAtendidosHoy++;
-
-        if (!juegoTerminado)
-        {
-            VerificarQuiebra();
-        }
-
-        ActualizarUICompleta();
-
-        if (!juegoTerminado)
-        {
-            PasarAlSiguienteCliente();
-        }
+        FinalizarTurno();
     }
 
     public void BotonRechazar()
     {
-        if (juegoTerminado || esperandoContinuarDia || clienteActual == null)
-            return;
+        if (juegoTerminado || esperandoContinuarDia || clienteActual == null) return;
 
+        bool esProhibido = !reglaDelDia.PuedeVender(clienteActual.ProductoPedido);
+        bool sinStock = !inventario.TieneProducto(clienteActual.ProductoPedido);
+
+        if (esProhibido || sinStock) ultimoMensajeEvento = "Rechazo justificado.";
+        else SumarAmonestacion("Rechazaste a un cliente legal con stock.", 2);
+
+        FinalizarTurno();
+    }
+
+    private void FinalizarTurno()
+    {
         clientesAtendidosHoy++;
-
-        // Pillamos si el cliente estaba pidiendo una vuelta prohibida
-        if (reglaDelDia != null && !reglaDelDia.PuedeVender(clienteActual.ProductoPedido))
-        {
-            ultimoMensajeEvento = "Bien jugado. Rechazaste a " + clienteActual.Nombre + " porque pedía algo prohibido. Evitaste la multa.";
-            // No restamos plata ni amonestamos porque hizo la vuelta bien
-        }
-        else
-        {
-            // Lo echó sin razón y pedía algo legal. Tome su amonestación.
-            SumarAmonestacion("Echaste a " + clienteActual.Nombre + " por pura pereza. El producto no estaba prohibido.", 2);
-        }
-
-        Debug.Log(ultimoMensajeEvento);
-
-        VerificarQuiebra();
         ActualizarUICompleta();
-
         if (!juegoTerminado)
         {
-            PasarAlSiguienteCliente();
+            indiceClienteActualDelDia++;
+            if (indiceClienteActualDelDia < clientesDelDia.Count) MostrarClienteActual();
+            else CerrarDiaActual();
         }
     }
 
-    private void PasarAlSiguienteCliente()
+    private void MostrarClienteActual()
     {
-        indiceClienteActualDelDia++;
-
-        if (clientesAtendidosHoy >= clientesPorDia || indiceClienteActualDelDia >= clientesDelDia.Count)
-        {
-            CerrarDiaActual();
-        }
-        else
-        {
-            MostrarClienteActual();
-        }
+        clienteActual = clientesDelDia[indiceClienteActualDelDia];
+        if (uiManager != null) uiManager.MostrarCliente(clienteActual);
     }
 
     private void CerrarDiaActual()
     {
-        if (juegoTerminado) return;
-
-        // Si ya llegamos al último día de la semana (Día 5)
         if (dia >= diasMaximos)
         {
-            // Llegó la hora de pagarle al gota a gota
-            if (dinero >= deuda)
-            {
-                FinJuego(false, "¡Coronaste, perro! Sobreviviste la semana y pagaste los $" + deuda + ". Te quedaron $" + (dinero - deuda) + " libres.");
-            }
-            else
-            {
-                FinJuego(true, "Paila, te torcieron. Terminó la semana y solo juntaste $" + dinero + " de los $" + deuda + " que debías.");
-            }
-            ActualizarUICompleta();
-            return;
+            // CONDICIÓN DE VICTORIA FINAL: Día 5 con 0 amonestaciones.
+            bool gano = (amonestaciones == 0);
+            string mensajeFin = gano
+                ? "¡DÍA 5 IMPECABLE! Pagaste la deuda con los $" + dinero + " ahorrados."
+                : "Paila. Llegaste al final pero las multas de hoy te hundieron.";
+            FinJuego(!gano, mensajeFin);
         }
-
-        // Si es cualquier otro día, simplemente pasamos al siguiente sin joder con metas
-        string mensajeCambioDia = "Se acabó el día " + dia + ". Pasamos al día " + (dia + 1) + ".";
-        ultimoMensajeEvento = mensajeCambioDia;
-        esperandoContinuarDia = true;
-        Debug.Log(mensajeCambioDia);
-
-        if (uiManager != null)
+        else
         {
-            uiManager.MostrarAvisoDia(mensajeCambioDia);
-            uiManager.MostrarPanelCambioDia(mensajeCambioDia);
+            esperandoContinuarDia = true;
+            string textoSiguiente = "Terminó el día " + dia + ".\n\n¿Pasamos al día " + (dia + 1) + "?";
+            if (uiManager != null) uiManager.MostrarPanelCambioDia(textoSiguiente);
         }
-
-        ActualizarUICompleta();
     }
-
 
     public void BotonContinuarDia()
     {
-        if (juegoTerminado || !esperandoContinuarDia)
-        {
-            return;
-        }
-
+        if (!esperandoContinuarDia) return;
         esperandoContinuarDia = false;
 
-        if (uiManager != null)
-        {
-            uiManager.OcultarPanelCambioDia();
-        }
+        // Ocultamos el panel antes de cargar el siguiente día
+        if (uiManager != null) uiManager.OcultarPanelCambioDia();
 
-        PrepararDia(dia + 1, false);
-        ActualizarUICompleta();
+        PrepararDia(dia + 1);
     }
 
-    public void FinDelDia()
-    {
-        if (juegoTerminado) return;
-
-        ultimoMensajeEvento = "El día solo se acaba cuando atiendas a los " + clientesPorDia + " clientes. ¡A camellar!";
-        ActualizarUICompleta();
-    }
-
-    private void SumarAmonestacion(string motivo, int penalizacionDinero)
+    private void SumarAmonestacion(string motivo, int multa)
     {
         amonestaciones++;
-        dinero -= penalizacionDinero;
-
-        if (penalizacionDinero > 0)
-        {
-            ultimoMensajeEvento = motivo + " Recibiste 1 amonestación y perdiste $" + penalizacionDinero + ".";
-        }
-        else
-        {
-            ultimoMensajeEvento = motivo + " Recibiste 1 amonestación.";
-        }
-
-        if (amonestaciones >= maxAmonestaciones)
-        {
-            FinJuego(true, "Acumulaste demasiadas amonestaciones.");
-            return;
-        }
-
-        if (juegoTerminado)
-        {
-            return;
-        }
-
-        VerificarQuiebra();
+        dinero -= multa;
+        ultimoMensajeEvento = motivo + " Amonestación: " + amonestaciones;
+        if (amonestaciones >= maxAmonestaciones) FinJuego(true, "Cerrado por el gobierno.");
     }
 
-    private bool InventarioVacio()
-    {
-        foreach (Producto producto in inventario.ObtenerProductos())
-        {
-            if (producto.Cantidad > 0)
-            {
-                return false;
-            }
-        }
+    private void FinJuego(bool muerto, string m) { juegoTerminado = true; if (uiManager != null) uiManager.MostrarGameOver(m); }
+    public void ReiniciarJuego() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    private void ActualizarUICompleta() { if (uiManager != null) uiManager.ActualizarUI(); }
 
-        return true;
-    }
-
-    private void VerificarQuiebra()
-    {
-        if (dinero < 0)
-        {
-            FinJuego(true, "Llegaste a quiebra. Te quedaste sin dinero.");
-        }
-    }
-
-    private void FinJuego(bool forzarGameOver, string motivo = "")
-    {
-        juegoTerminado = true;
-
-        if (forzarGameOver)
-        {
-            ultimoMensajeEvento = "GAME OVER. " + motivo;
-        }
-        else if (!string.IsNullOrEmpty(motivo))
-        {
-            ultimoMensajeEvento = motivo;
-        }
-        else if (dinero >= deuda)
-        {
-            ultimoMensajeEvento = "Ganaste el juego, pagaste la deuda.";
-        }
-        else
-        {
-            ultimoMensajeEvento = "Perdiste el juego, no pudiste pagar la deuda.";
-        }
-
-        Debug.Log(ultimoMensajeEvento);
-
-        if (uiManager != null)
-        {
-            uiManager.MostrarGameOver(ultimoMensajeEvento);
-        }
-    }
-
-    public void ReiniciarJuego()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-
-    public Inventario ObtenerInventario()
-    {
-        return inventario;
-    }
-
-    public string ObtenerUltimoMensajeEvento()
-    {
-        return ultimoMensajeEvento;
-    }
-
-    public string ObtenerEventoDelDiaActual()
-    {
-        return eventoDelDiaActual;
-    }
-
-    public bool JuegoTerminado()
-    {
-        return juegoTerminado;
-    }
-
-    public int ObtenerDineroGanadoEnElDia()
-    {
-        return dineroGanadoEnElDia;
-    }
-
-    public int ObtenerMetaMinimaDiaria()
-    {
-        return metaMinimaDiaria;
-    }
-
-    public int ObtenerClientesAtendidosHoy()
-    {
-        return clientesAtendidosHoy;
-    }
-
-    public int ObtenerClientesPorDia()
-    {
-        return clientesPorDia;
-    }
-
-
-    private void ActualizarUICompleta()
-    {
-        if (uiManager == null)
-        {
-            uiManager = FindObjectOfType<UIManager>();
-        }
-
-        if (uiManager != null)
-        {
-            uiManager.ActualizarUI();
-            uiManager.MostrarEstado(ultimoMensajeEvento);
-            uiManager.MostrarEventoDelDia(eventoDelDiaActual);
-        }
-    }
-
+    public string ObtenerUltimoMensajeEvento() => ultimoMensajeEvento;
+    public string ObtenerEventoDelDiaActual() => eventoDelDiaActual;
+    public int ObtenerMetaMinimaDiaria() => metaMinimaDiaria;
+    public int ObtenerClientesAtendidosHoy() => clientesAtendidosHoy;
+    public int ObtenerClientesPorDia() => clientesDelDia.Count;
+    public Inventario ObtenerInventario() => inventario;
+    public int ObtenerDineroGanadoEnElDia() => dineroGanadoEnElDia;
 }
