@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Configuración")]
     public int dineroInicial = 50;
-    public int diasMaximos = 5; // Forzado a 5 días
+    public int diasMaximos = 5;
     public int amonestaciones = 0;
     public int maxAmonestaciones = 3;
     public int clientesPorDia = 5;
@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour
 
         dinero = dineroInicial;
         dia = 1;
-        diasMaximos = 5; // Aseguramos que sea 5
+        diasMaximos = 5;
         juegoTerminado = false;
         PrepararDia(1);
     }
@@ -59,12 +59,11 @@ public class GameManager : MonoBehaviour
         dia = nuevoDia;
         clientesAtendidosHoy = 0;
         indiceClienteActualDelDia = 0;
-        amonestaciones = 0; // Reinicio diario de multas
+        amonestaciones = 0;
         esperandoContinuarDia = false;
         dineroGanadoEnElDia = 0;
 
         List<string> prohibidos = new List<string>();
-        // Configuración de reglas por día
         if (dia == 1) prohibidos.Add("leche");
         else if (dia == 2) prohibidos.Add("huevos");
         else if (dia == 3) prohibidos.Add("pan");
@@ -151,7 +150,6 @@ public class GameManager : MonoBehaviour
     {
         if (dia >= diasMaximos)
         {
-            // CONDICIÓN DE VICTORIA FINAL: Día 5 con 0 amonestaciones.
             bool gano = (amonestaciones == 0);
             string mensajeFin = gano
                 ? "¡DÍA 5 IMPECABLE! Pagaste la deuda con los $" + dinero + " ahorrados."
@@ -170,10 +168,7 @@ public class GameManager : MonoBehaviour
     {
         if (!esperandoContinuarDia) return;
         esperandoContinuarDia = false;
-
-        // Ocultamos el panel antes de cargar el siguiente día
         if (uiManager != null) uiManager.OcultarPanelCambioDia();
-
         PrepararDia(dia + 1);
     }
 

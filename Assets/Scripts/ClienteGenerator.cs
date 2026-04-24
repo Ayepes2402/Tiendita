@@ -15,44 +15,44 @@ public class ClienteGenerator
         switch (numeroDia)
         {
             case 1:
-                // DIA 1 (Prohibido: Leche). Solo 1 cliente pide leche, los demás dan plata.
-                clientesDelDia.Add(CrearMiguel()); // Pide Pan (Legal)
-                clientesDelDia.Add(CrearJosh());   // Pide Pan (Legal)
-                clientesDelDia.Add(CrearJustin()); // Pide Huevos (Legal)
-                clientesDelDia.Add(CrearFercho()); // Pide Pan (Legal)
-                clientesDelDia.Add(CrearCam());    // Pide Leche (Prohibido - Trampa normal)
+                // DIA 1 (Prohibido: Leche).
+                clientesDelDia.Add(CrearMiguel());
+                clientesDelDia.Add(CrearMaluma());   // Nuevo (Pan - Legal)
+                clientesDelDia.Add(CrearJustin());
+                clientesDelDia.Add(CrearElon());     // Nuevo (Leche - TRAMPA)
+                clientesDelDia.Add(CrearCam());
                 break;
             case 2:
-                // DIA 2 (Prohibido: Huevos). Puros clientes de pan y leche.
-                clientesDelDia.Add(CrearMiguel()); // Pide Pan (Legal)
-                clientesDelDia.Add(CrearJeronimo(trampaPrincipal)); // Trampa: Pide Huevos
-                clientesDelDia.Add(CrearDonaMercedes()); // Pide Leche (Legal)
-                clientesDelDia.Add(CrearFercho()); // Pide Pan (Legal)
-                clientesDelDia.Add(CrearCam()); // Pide Leche (Legal)
+                // DIA 2 (Prohibido: Huevos).
+                clientesDelDia.Add(CrearMessi());    // Nuevo (Leche - Legal)
+                clientesDelDia.Add(CrearJeronimo(trampaPrincipal));
+                clientesDelDia.Add(CrearFlorinda()); // Nuevo (Huevos - TRAMPA)
+                clientesDelDia.Add(CrearFercho());
+                clientesDelDia.Add(CrearDonaMercedes());
                 break;
             case 3:
                 // DIA 3 (Prohibido: Pan).
-                clientesDelDia.Add(CrearWisin(trampaPrincipal)); // Trampa: Pide Pan
-                clientesDelDia.Add(CrearDonaMercedes()); // Pide Leche (Legal)
-                clientesDelDia.Add(CrearJustin()); // Pide Huevos (Legal)
-                clientesDelDia.Add(CrearBob()); // Pide Huevos (Legal)
-                clientesDelDia.Add(CrearCam()); // Pide Leche (Legal)
+                clientesDelDia.Add(CrearWisin(trampaPrincipal));
+                clientesDelDia.Add(CrearShakira());  // Nuevo (Pan - TRAMPA)
+                clientesDelDia.Add(CrearJustin());
+                clientesDelDia.Add(CrearElon());     // Nuevo (Leche - Legal)
+                clientesDelDia.Add(CrearBob());
                 break;
             case 4:
-                // DIA 4 (Prohibido: Leche y Huevos). Solo el pan es seguro.
-                clientesDelDia.Add(CrearJeronimo(trampaPrincipal)); // Trampa Leche
-                clientesDelDia.Add(CrearYandel(trampaSecundaria)); // Trampa Huevos
-                clientesDelDia.Add(CrearMiguel()); // Pide Pan (Legal)
-                clientesDelDia.Add(CrearJosh()); // Pide Pan (Legal)
-                clientesDelDia.Add(CrearFercho()); // Pide Pan (Legal)
+                // DIA 4 (Prohibido: Leche y Huevos).
+                clientesDelDia.Add(CrearMaluma());   // Nuevo (Pan - Legal)
+                clientesDelDia.Add(CrearYandel(trampaSecundaria));
+                clientesDelDia.Add(CrearMessi());    // Nuevo (Leche - TRAMPA)
+                clientesDelDia.Add(CrearJosh());
+                clientesDelDia.Add(CrearFlorinda()); // Nuevo (Huevos - TRAMPA)
                 break;
             case 5:
-                // DIA 5 (Prohibido: Huevos y Pan). Solo la leche es segura.
-                clientesDelDia.Add(CrearWisin(trampaPrincipal)); // Trampa Huevos
-                clientesDelDia.Add(CrearYandel(trampaSecundaria)); // Trampa Pan
-                clientesDelDia.Add(CrearCam()); // Pide Leche (Legal)
-                clientesDelDia.Add(CrearDonaMercedes()); // Pide Leche (Legal)
-                clientesDelDia.Add(CrearJeronimo(trampaPrincipal)); // Trampa Huevos
+                // DIA 5 (Prohibido: Huevos y Pan).
+                clientesDelDia.Add(CrearWisin(trampaPrincipal));
+                clientesDelDia.Add(CrearShakira());  // Nuevo (Pan - TRAMPA)
+                clientesDelDia.Add(CrearCam());
+                clientesDelDia.Add(CrearElon());     // Nuevo (Leche - Legal)
+                clientesDelDia.Add(CrearJeronimo(trampaPrincipal));
                 break;
         }
         return clientesDelDia;
@@ -66,6 +66,13 @@ public class ClienteGenerator
     private Cliente CrearJustin() => new Cliente("Justin", TipoCliente.Normal, "huevos", 30, "BAAABY, dame un huevo, porfi", 5);
     private Cliente CrearDonaMercedes() => new Cliente("Dona Mercedes", TipoCliente.Normal, "leche", 25, "Buenas. Quiero una leche, pero me la da en buen estado, ¿sí?", 6);
     private Cliente CrearFercho() => new Cliente("Fercho", TipoCliente.Apurado, "pan", 20, "Regáleme ahí un pan, por favor", 7);
+
+    // --- Nuevos Personajes ---
+    private Cliente CrearMaluma() => new Cliente("Maluma", TipoCliente.Normal, "pan", 22, "Ey parcero, un pancito que hoy me siento 'Papi Juancho'.", 10);
+    private Cliente CrearElon() => new Cliente("Elon", TipoCliente.Normal, "leche", 40, "¿Aceptas Dogecoin? No, mentira... dame una leche para ir a Marte.", 11);
+    private Cliente CrearFlorinda() => new Cliente("Doña Florinda", TipoCliente.Apurado, "huevos", 25, "No me junte con la chusma... y deme una cubeta de huevos.", 12);
+    private Cliente CrearMessi() => new Cliente("Messi", TipoCliente.Normal, "leche", 30, "Vení, dame una leche... ¿qué mirás bobo? Andá para allá.", 13);
+    private Cliente CrearShakira() => new Cliente("Shakira", TipoCliente.Apurado, "pan", 28, "Las mujeres ya no lloran, las mujeres facturan... y comen pan.", 14);
 
     // --- Sospechosos ---
     private Cliente CrearJeronimo(string p) => new Cliente("Jerónimo", TipoCliente.Sospechoso, p, 15, "Che, ¿me das por favor " + p + "? es que tengo siete cafeteras en casa", 1);

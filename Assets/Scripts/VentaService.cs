@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 
-
 public class VentaService
 {
     private Inventario inventario;
@@ -18,9 +17,7 @@ public class VentaService
 
         Producto producto = inventario.ObtenerProducto(cliente.ProductoPedido);
 
-        // PASARSE POR LAS GUEVAS EL DINERO:
-        // Eliminamos el chequeo de "if (cliente.Dinero < producto.Precio)"
-
+        // Se ignora el chequeo de dinero del cliente según tu última modificación.
         producto.ReducirStock();
         return true;
     }
