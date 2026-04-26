@@ -1,3 +1,6 @@
+diseño nuestro de figma: https://www.figma.com/design/qozdKdwAI1OosxUcreir5t/juego?node-id=0-1&t=yP4xotYLdK3GiYoG-1
+
+
 isolated777. (2023). Momo bailando [GIF]. Tenor. https://tenor.com/es-US/view/momo-el-momo-momo-bailando-gif-4360999792934006051
 
 
