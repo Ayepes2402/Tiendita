@@ -6,6 +6,27 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/Escena Menu De Inicio.unity
+    guid: 65296e70034bcfb4e811742d254a7ff1
+  - enabled: 1
+    path: Assets/Scenes/EscenaLore.unity
+    guid: 96b396d03d174eb47a6dfe1ae3e16891
+  - enabled: 1
+    path: Assets/Scenes/Escena_EntreDias.unity
+    guid: 6719757db5276544d8d0732b8c794418
+  - enabled: 1
+    path: Assets/Scenes/Escena_Tienda.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/Escena_FinDeDia.unity
+    guid: 9c595230a93ce2a46aed5d5c14f6df88
+  - enabled: 1
+    path: Assets/Scenes/EscenaGanasteJuego.unity
+    guid: 72d6f23ee4b3d2d44b147be995282951
+  - enabled: 1
+    path: Assets/Scenes/Escena de Gameover por no pagar la deuda.unity
+    guid: 0231f472f094800438ad9fcdf4c7c393
+  - enabled: 1
+    path: Assets/Scenes/Escena de Gameover por amonestaciones.unity
+    guid: d1ce60c897f4bcc42a3529580d674c92
   m_configObjects: {}

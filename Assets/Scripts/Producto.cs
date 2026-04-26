@@ -4,7 +4,7 @@ public class Producto
 {
     public string Nombre { get; private set; }
     public int Precio { get; private set; }
-    public int Cantidad { get; private set; }
+    public int Cantidad { get; set; }
     public CategoriaProducto Categoria { get; private set; }
 
     public Producto(string nombre, int precio, int cantidad)
@@ -32,7 +32,10 @@ public class Producto
             Cantidad--;
         }
     }
-
+    public void AumentarStock(int cantidadComprada)
+    {
+        Cantidad += cantidadComprada;
+    }
     public bool EsDeCategoria(CategoriaProducto categoria)
     {
         return Categoria == categoria;

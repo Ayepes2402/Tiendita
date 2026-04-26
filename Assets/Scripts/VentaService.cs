@@ -17,7 +17,7 @@ public class VentaService
 
         Producto producto = inventario.ObtenerProducto(cliente.ProductoPedido);
 
-        // Se ignora el chequeo de dinero del cliente según tu última modificación.
+        
         producto.ReducirStock();
         return true;
     }
