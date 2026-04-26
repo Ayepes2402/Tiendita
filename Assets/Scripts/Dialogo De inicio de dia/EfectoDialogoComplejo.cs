@@ -42,7 +42,7 @@ public class EfectoDialogo : MonoBehaviour
             // Sumamos 1 porque el GameManager guarda el día que ACABAMOS de terminar
             int proximoDia = GameManager.Instance.dia + 1;
 
-            if (textoFijo != null) textoFijo.text = "DÍA " + proximoDia;
+            if (textoFijo != null) textoFijo.text = "DIA " + proximoDia;
 
             textoDeLaRegla = ObtenerTextoSegunDia(proximoDia);
         }

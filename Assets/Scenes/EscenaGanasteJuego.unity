@@ -153,7 +153,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioSource: {fileID: 1103259852}
   sonidosDialogo:
-  - {fileID: 8300000, guid: c84b5d0a89886c944b7f23eba932154e, type: 3}
+  - {fileID: 8300000, guid: 1293f47bf730e94468d1b04a7313336f, type: 3}
 --- !u!4 &132701856
 Transform:
   m_ObjectHideFlags: 0

@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class ControladorGameOver : MonoBehaviour
 {
+    [Header("Configuración de Escenas")]
+    public string nombreEscenaMenu = "Escena Menu De Inicio";
     // Usa este si el botón es para volver a jugar desde el Día 1
     public void BotonReintentar()
     {
@@ -32,6 +34,6 @@ public class ControladorGameOver : MonoBehaviour
         }
 
         // Vamos a tu escena de historia / menú principal
-        SceneManager.LoadScene("EscenaLore");
+        SceneManager.LoadScene(nombreEscenaMenu);
     }
 }

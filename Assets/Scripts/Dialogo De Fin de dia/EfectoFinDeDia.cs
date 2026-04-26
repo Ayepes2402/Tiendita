@@ -47,7 +47,7 @@ public class EfectoFinDeDia : MonoBehaviour
         if (GameManager.Instance != null)
         {
             if (textoTituloResumen != null)
-                textoTituloResumen.text = "RESUMEN DEL DÍA " + GameManager.Instance.dia;
+                textoTituloResumen.text = "RESUMEN DEL DIA " + GameManager.Instance.dia;
 
             textoDelResumen = "Dinero ganado hoy: $" + GameManager.Instance.ObtenerDineroGanadoEnElDia() +
                               "\n\nFaltas del gobierno: " + GameManager.Instance.amonestaciones + " / " + GameManager.Instance.maxAmonestaciones;
