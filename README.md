@@ -1,52 +1,15 @@
 ( EL EJECUTABLE ESTA COMPRIMIDO ACA)
+**ReadMe 1:**
+**ReadMe 2:**
 
+El profe sugirió que sería bueno incluir más eventos y que estos fueran aleatorios, idealmente configurados con ScriptableObjects para que el sistema fuera más flexible y desacoplado del código. Sin embargo, en nuestro caso decidimos no implementar aleatoriedad ni en los eventos ni en los clientes, principalmente porque esto nos estaba generando muchos problemas a la hora de balancear la economía del juego. Al ser un prototipo centrado en la supervivencia y la gestión precisa de recursos, necesitábamos tener un mayor control sobre lo que ocurría cada día para asegurar que la experiencia fuera justa y entendible.
 
-TIENDITA - Prototipo Funcional de Gestión
-Este proyecto es un simulador de gestión de tienda desarrollado en Unity, enfocado en la toma de decisiones bajo presión y el cumplimiento de normativas gubernamentales abstractas.
+También se mencionó un problema con las amonestaciones, donde parecía que se penalizaba al jugador por vender productos que en realidad no había vendido. Este sistema fue revisado y corregido por completo, asegurando que ahora las penalizaciones correspondan correctamente a las acciones reales del jugador dentro de la partida.
 
-Contexto y Alcance del Proyecto
+Por otro lado, el profe señaló que la interfaz no era lo suficientemente clara, lo que dificultaba seguir el estado del juego. A partir de esto, se trabajó en mejorar significativamente la UI, haciéndola mucho más clara, amigable y visualmente agradable, para que el jugador pueda entender fácilmente qué está pasando y qué decisiones debe tomar.
 
-- A partir de la retroalimentación docente, el equipo decidió realizar un ajuste estratégico en el alcance del proyecto. El objetivo principal fue priorizar la solidez de un prototipo funcional sobre la cantidad de mecánicas.
+Finalmente, también se mencionó la falta de reto y de un flujo de juego más completo (como menú principal, música, etc.). Estos aspectos fueron reforzados, integrando un flujo más definido y elementos que hacen que la experiencia se sienta más estructurada y completa dentro de lo que permite el alcance del prototipo.
 
-Ajustes de Diseño:
-
-
-- Reducción de Alcance: Se eliminó la línea de actividades criminales y sistemas de persecución (policía) para centrar la experiencia en la microgestión y la atención al cliente.
-
-- Foco en Calidad: Se priorizó la implementación técnica pulida (sistemas de audio dinámico, persistencia de datos y feedback visual) en lugar de incluir rutas alternativas confusas.
-
-Mecánicas Principales
-
-
-El núcleo del juego se basa en la administración de recursos en un entorno cambiante:
-
-- Atención al Cliente: Sistema de diálogo interactivo donde cada cliente posee una identidad visual y sonora única.
-
-- Gestión de Inventario: Control de stock de productos básicos (Pan, Leche, Huevos) con precios de reabastecimiento variables.
-
-- Economía de Supervivencia: Manejo de dinero para pagar deudas acumuladas al final de la semana.
-
-- Sistema de Reglas Acumulativas: Cada día el gobierno impone nuevas leyes. Estas no siempre se reemplazan, sino que pueden sumarse o volverse más abstractas, aumentando la dificultad de discernir qué es legal vender y qué no.
-
-- Sistema de Amonestaciones: El incumplimiento de las normas genera penalizaciones económicas directas. Tres amonestaciones resultan en un cierre forzoso de la tienda (Game Over).
-
-Detalles Técnicos
-
-- Arquitectura: Uso de patrones Singleton para el GameManager y el AudioManager, asegurando una gestión centralizada del estado del juego.
-
-- Sistema de Audio:Voces únicas para cada personaje calculadas según su índice de identidad.
-
-- Efecto de máquina de escribir.
-
-- SFX de feedback inmediato para ventas exitosas.
-
-UI/UX:
-
-- Sistemas de Fade-in/Fade-out para transiciones fluidas entre días.
-
-- Efectos de Hover y opacidad dinámica en botones para mejorar la respuesta al usuario.
-
-- Menú de ajustes de volumen mediantes.
 
 
 Equipo de Trabajo
