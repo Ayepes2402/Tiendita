@@ -1,5 +1,6 @@
 ( EL EJECUTABLE ESTA COMPRIMIDO ACA)
-**ReadMe 1:**
+
+
 **ReadMe 2:**
 
 El profe sugirió que sería bueno incluir más eventos y que estos fueran aleatorios, idealmente configurados con ScriptableObjects para que el sistema fuera más flexible y desacoplado del código. Sin embargo, en nuestro caso decidimos no implementar aleatoriedad ni en los eventos ni en los clientes, principalmente porque esto nos estaba generando muchos problemas a la hora de balancear la economía del juego. Al ser un prototipo centrado en la supervivencia y la gestión precisa de recursos, necesitábamos tener un mayor control sobre lo que ocurría cada día para asegurar que la experiencia fuera justa y entendible.
