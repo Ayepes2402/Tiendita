@@ -36,13 +36,13 @@ Detalles Técnicos
 
 - Sistema de Audio:Voces únicas para cada personaje calculadas según su índice de identidad.
 
-- Efecto de máquina de escribir..
+- Efecto de máquina de escribir.
 
 - SFX de feedback inmediato para ventas exitosas.
 
 UI/UX:
 
-- Sistemas de Fade-in/Fade-out mediante CanvasGroups para transiciones fluidas entre días.
+- Sistemas de Fade-in/Fade-out para transiciones fluidas entre días.
 
 - Efectos de Hover y opacidad dinámica en botones para mejorar la respuesta al usuario.
 
