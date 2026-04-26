@@ -24,14 +24,13 @@ public class DragUICategoria : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         miImagen = GetComponent<Image>();
         gameManager = FindObjectOfType<GameManager>();
 
-        // Le damos una micro-fracción de segundo pa' que el GameManager 
-        // alcance a crear el Inventario antes de que la repisa intente leerlo.
+       
         Invoke("ActualizarTextoDesdeBackend", 0.1f);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // Revisamos el inventario real del sistema antes de dejarlo agarrar nada
+        
         int unidadesReales = ObtenerUnidadesReales();
         if (unidadesReales <= 0) return;
 
@@ -65,14 +64,12 @@ public class DragUICategoria : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         }
     }
 
-    // El DropUICliente sigue llamando a esto, pero ahora solo actualiza la foto
-    // porque el GameManager ya se encargó de restar la mercancía en su código
+   
     public void RestarInventario()
     {
         ActualizarTextoDesdeBackend();
     }
 
-    // Esta es la función que se asoma a la base de datos real
     public void ActualizarTextoDesdeBackend()
     {
         if (gameManager == null) return;
@@ -84,14 +81,14 @@ public class DragUICategoria : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             textoContador.text = unidadesReales.ToString();
         }
 
-        // Si se nos acabó la vaina en la base de datos, ponemos el dibujo gris
+       
         if (unidadesReales <= 0)
         {
             miImagen.color = new Color(0.5f, 0.5f, 0.5f, 1f);
         }
     }
 
-    // Busca el número real metiéndose por las tripas del GameManager
+    
     public int ObtenerUnidadesReales()
     {
         if (gameManager != null && gameManager.ObtenerInventario() != null)
@@ -99,6 +96,6 @@ public class DragUICategoria : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             var producto = gameManager.ObtenerInventario().ObtenerProducto(nombreProducto);
             if (producto != null) return producto.Cantidad;
         }
-        return 0; // Si no lo encuentra, devuelve 0 por seguridad
+        return 0; 
     }
 }

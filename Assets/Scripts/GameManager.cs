@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    // --- SINGLETON ---
+
     public static GameManager Instance;
 
     private Cliente clienteActual;
@@ -122,7 +122,7 @@ public class GameManager : MonoBehaviour
         reglaDelDia = new ReglaGobierno(prohibidos);
         eventoDelDiaActual = "PROHIBIDO: " + reglaDelDia.ObtenerListaProhibida().ToUpper();
 
-        // Como el generador ya se creó en el Awake, esto nunca fallará
+      
         clientesDelDia = generador.ObtenerClientesDelDia(dia, prohibidos);
 
         if (uiManager != null)
@@ -236,24 +236,24 @@ public class GameManager : MonoBehaviour
 
             if (gano)
             {
-                // Aquí puedes dejar el mensaje de victoria o cargar una escena de ganar si la haces luego
+                
                 SceneManager.LoadScene("EscenaGanasteJuego");
             }
             else
             {
-                // Si el nea no tiene la liga completa, para la calle
+                
                 juegoTerminado = true;
                 SceneManager.LoadScene("Escena de Gameover por no pagar la deuda");
             }
         }
         else
         {
-            // Si no es el día final, seguimos al resumen normal
+            
             SceneManager.LoadScene("Escena_FinDeDia");
         }
     }
 
-    // --- NUEVA LÓGICA DE COMPRA ---
+
     public bool ComprarArticulo(string nombreProducto, int costo)
     {
         if (dinero >= costo)
@@ -283,7 +283,7 @@ public class GameManager : MonoBehaviour
 
         if (amonestaciones >= maxAmonestaciones)
         {
-            // En lugar de abrir un panel, cargamos la escena directamente
+            
             juegoTerminado = true;
             SceneManager.LoadScene("Escena de Gameover por amonestaciones");
         }

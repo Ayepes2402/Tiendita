@@ -33,7 +33,7 @@ public class ClienteGenerator
               
                 break;
 
-            case 3: // Día 3: 
+            case 3: 
                 clientesDelDia.Add(CrearWisin(trampaPrincipal));
                 clientesDelDia.Add(CrearShakira());
               
@@ -45,7 +45,7 @@ public class ClienteGenerator
                 clientesDelDia.Add(CrearBob());
                 break;
 
-            case 4: // Día 4: 
+            case 4: 
                 clientesDelDia.Add(CrearMaluma());
                 clientesDelDia.Add(CrearYandel(trampaSecundaria));
                 clientesDelDia.Add(CrearJustin());
@@ -58,7 +58,7 @@ public class ClienteGenerator
                
                 break;
 
-            case 5: // 
+            case 5: 
                 clientesDelDia.Add(CrearElon());
                 clientesDelDia.Add(CrearWisin(trampaPrincipal));
                 clientesDelDia.Add(CrearShakira());
@@ -75,7 +75,7 @@ public class ClienteGenerator
         return clientesDelDia;
     }
 
-    // --- Personajes Originales (Con opciones de respuesta) ---
+
     private Cliente CrearMiguel() => new Cliente("Miguel", TipoCliente.Normal, "pan", 20, "Glup, glup, pan, glup, glup", 0,
         "Toma tu pan acuático", "¿Por qué haces ese ruido?", "¡Glup, gracias!", "Glup... no me entiendes.");
 
@@ -97,7 +97,7 @@ public class ClienteGenerator
     private Cliente CrearFercho() => new Cliente("Fercho", TipoCliente.Apurado, "pan", 20, "Regáleme ahí un pan, por favor", 7,
         "De una, mi so.", "Espere su turno.", "¡Melo caramelo!", "Qué demora, parce...");
 
-    // --- Nuevos Personajes ---
+  
     private Cliente CrearMaluma() => new Cliente("Maluma", TipoCliente.Normal, "pan", 22, "Ey parcero, un pancito que hoy me siento 'Papi Juancho'.", 10,
         "Pan pa'l Pretty Boy.", "Bájale al ego.", "¡Mua! Las nenas lo aprueban.", "Uy quieto, qué agresividad.");
 
@@ -113,7 +113,7 @@ public class ClienteGenerator
     private Cliente CrearShakira() => new Cliente("Shakira", TipoCliente.Apurado, "pan", 28, "Las mujeres ya no lloran, las mujeres facturan... y comen pan.", 14,
         "Claro, loba. Toma tu pan.", "Salpique de aquí.", "¡Auuu! Gracias.", "Te felicito, qué bien actúas.");
 
-    // --- Sospechosos ---
+    
     private Cliente CrearJeronimo(string p) => new Cliente("Jerónimo", TipoCliente.Sospechoso, p, 15, "Che, ¿me das por favor " + p + "? es que tengo siete cafeteras en casa", 1,
         "Raro, pero toma.", "Llamaré a la policía.", "¡Sos un crack!", "Che, no seas ortiva.");
 

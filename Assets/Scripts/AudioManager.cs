@@ -22,14 +22,12 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    // Ahora le pedimos el índice de la voz que queremos usar
-    // Al ponerle "= 0", si un script (como la pantalla final) no le manda número,
-    // por defecto usará la voz 0 sin estallar el juego.
+    
     public void ReproducirDialogo(int indiceVoz = 0, float tonoVoz = 1f)
     {
         if (sonidosDialogo.Length == 0) return;
 
-        // El "%" (módulo) es un escudo protector. 
+         
         int indexSeguro = indiceVoz % sonidosDialogo.Length;
 
         audioSource.clip = sonidosDialogo[indexSeguro];

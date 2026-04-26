@@ -12,7 +12,7 @@ public class ReglaGobierno
 
     public bool PuedeVender(string producto)
     {
-        // Revisa si el producto está en la lista negra
+        
         foreach (string prohibido in productosProhibidos)
         {
             if (string.Equals(producto, prohibido, StringComparison.OrdinalIgnoreCase))

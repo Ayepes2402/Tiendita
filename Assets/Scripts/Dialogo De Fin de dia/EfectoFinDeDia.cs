@@ -33,10 +33,10 @@ public class EfectoFinDeDia : MonoBehaviour
     public float velocidadTransicionNegra = 2f;
 
     [Header("Sonidos")]
-    public AudioSource audioSourceEfectos; // El parlante para los botones
-    public AudioClip sonidoComprar;        // Sonido de platica (Cha-ching)
-    public AudioClip sonidoError;          // Sonido de error por si no le alcanza la plata
-    public AudioClip sonidoClickNormal;    // Sonido para el botón Continuar
+    public AudioSource audioSourceEfectos; 
+    public AudioClip sonidoComprar;        
+    public AudioClip sonidoError;          
+    public AudioClip sonidoClickNormal;    
 
     private Color colorOriginalTexto = Color.white;
 
@@ -106,7 +106,7 @@ public class EfectoFinDeDia : MonoBehaviour
     {
         estaEscribiendo = true;
 
-        // --- PRENDEMOS EL AUDIO DEL DIÁLOGO (MÁQUINA DE ESCRIBIR) ---
+      
         if (AudioManager.instancia != null) AudioManager.instancia.ReproducirDialogo();
 
         textoResumenAnimado.text = textoDelResumen;
@@ -121,7 +121,7 @@ public class EfectoFinDeDia : MonoBehaviour
             yield return new WaitForSeconds(velocidadEscritura);
         }
 
-        // --- APAGAMOS EL AUDIO DEL DIÁLOGO ---
+       
         if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
 
         estaEscribiendo = false;
@@ -134,7 +134,7 @@ public class EfectoFinDeDia : MonoBehaviour
         {
             StopCoroutine(corrutinaEscritura);
 
-            // --- APAGAMOS EL AUDIO SI EL JUGADOR SALTA LA ANIMACIÓN ---
+            
             if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
 
             textoResumenAnimado.maxVisibleCharacters = textoResumenAnimado.textInfo.characterCount;
@@ -179,7 +179,7 @@ public class EfectoFinDeDia : MonoBehaviour
         }
     }
 
-    // --- FUNCIONES DE COMPRA CON AUDIO ---
+   
     public void ComprarPan()
     {
         if (GameManager.Instance.ComprarArticulo("pan", GameManager.Instance.costoCompraPan))

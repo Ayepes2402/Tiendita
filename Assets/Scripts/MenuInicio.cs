@@ -17,15 +17,14 @@ public class MenuInicio : MonoBehaviour
 
     private void Start()
     {
-        // --- SEGURO DE REINICIO ---
-        // Si venimos de una partida a medias, matamos al GameManager viejo para empezar limpios
+       
         if (GameManager.Instance != null)
         {
             Destroy(GameManager.Instance.gameObject);
             GameManager.Instance = null;
         }
 
-        // --- LO QUE YA TENÍAS ---
+       
         if (panelAjustes != null) panelAjustes.SetActive(false);
 
         if (sliderVolumen != null)
@@ -50,12 +49,12 @@ public class MenuInicio : MonoBehaviour
         }
     }
 
-    // --- BOTONES CON SONIDO ---
+
 
     public void BotonJugar()
     {
         ReproducirClick();
-        // Esperamos un pelín para que el sonido se alcance a escuchar antes del cambio de escena
+       
         Invoke("CargarLore", 0.15f);
     }
 

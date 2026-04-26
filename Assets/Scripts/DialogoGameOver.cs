@@ -29,8 +29,8 @@ public class EfectoDialogoComplejo : MonoBehaviour
     public float velocidadFadeBoton = 1.5f;
 
     [Header("Sonidos")]
-    public AudioSource audioSourceEfectos; // El parlante para el click de los botones
-    public AudioClip sonidoClickNormal;    // El sonido del click
+    public AudioSource audioSourceEfectos; 
+    public AudioClip sonidoClickNormal;    
 
     private int indiceActual = 0;
     private bool estaEscribiendo = false;
@@ -112,7 +112,7 @@ public class EfectoDialogoComplejo : MonoBehaviour
     {
         estaEscribiendo = true;
 
-        // --- PRENDEMOS EL AUDIO DEL DIÁLOGO ---
+       
         if (AudioManager.instancia != null) AudioManager.instancia.ReproducirDialogo();
 
         textoDialogoAnimado.text = parrafos[indiceActual];
@@ -128,7 +128,7 @@ public class EfectoDialogoComplejo : MonoBehaviour
             yield return new WaitForSeconds(velocidadEscritura);
         }
 
-        // --- APAGAMOS EL AUDIO AL TERMINAR DE ESCRIBIR ---
+       
         if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
 
         estaEscribiendo = false;
@@ -137,7 +137,7 @@ public class EfectoDialogoComplejo : MonoBehaviour
 
     public void AvanzarOSaltarDialogo()
     {
-        // Opcional: Que suene el click también cuando saltas el diálogo rápido
+        
         if (audioSourceEfectos != null && sonidoClickNormal != null)
         {
             audioSourceEfectos.PlayOneShot(sonidoClickNormal);
@@ -150,7 +150,7 @@ public class EfectoDialogoComplejo : MonoBehaviour
                 StopCoroutine(corrutinaEscritura);
             }
 
-            // --- APAGAMOS EL AUDIO SI EL JUGADOR SALTA LA ANIMACIÓN ---
+            
             if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
 
             textoDialogoAnimado.maxVisibleCharacters = textoDialogoAnimado.textInfo.characterCount;
@@ -192,10 +192,10 @@ public class EfectoDialogoComplejo : MonoBehaviour
         }
     }
 
-    // --- LÓGICA DE TRANSICIÓN ---
+   
     public void CargarSiguienteEscena()
     {
-        // --- SONIDO AL DAR CLIC EN EL BOTÓN DE SALIR ---
+        
         if (audioSourceEfectos != null && sonidoClickNormal != null)
         {
             audioSourceEfectos.PlayOneShot(sonidoClickNormal);

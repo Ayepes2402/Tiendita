@@ -14,8 +14,8 @@ public class EfectoMaquinaDeEscribir : MonoBehaviour
     public string nombreEscenaACargar;
 
     [Header("Transición de Escena")]
-    public CanvasGroup pantallaNegra; // Arrastra aquí tu nueva imagen negra
-    public float velocidadTransicion = 2f; // Qué tan rápido se pone la pantalla negra
+    public CanvasGroup pantallaNegra; 
+    public float velocidadTransicion = 2f; 
 
     [Header("Configuración")]
     [TextArea(3, 10)]
@@ -38,7 +38,7 @@ public class EfectoMaquinaDeEscribir : MonoBehaviour
             grupoBotonEscena.blocksRaycasts = false;
         }
 
-        // Nos aseguramos de que la pantalla negra esté invisible al iniciar
+        
         if (pantallaNegra != null)
         {
             pantallaNegra.alpha = 0;
@@ -133,37 +133,37 @@ public class EfectoMaquinaDeEscribir : MonoBehaviour
         }
     }
 
-    // --- NUEVA LÓGICA DE TRANSICIÓN ---
+    
     public void CargarSiguienteEscena()
     {
-        // En vez de cargar de una, lanzamos la animación de la pantalla negra
+        
         if (pantallaNegra != null)
         {
             StartCoroutine(TransicionYCambioDeEscena());
         }
         else
         {
-            // Por si se te olvida arrastrar la pantalla negra en el Inspector
+            
             SceneManager.LoadScene(nombreEscenaACargar);
         }
     }
 
     IEnumerator TransicionYCambioDeEscena()
     {
-        // Bloqueamos los clics para que el jugador no rompa nada mientras se hace el fundido
+        
         pantallaNegra.blocksRaycasts = true;
 
-        // Subimos el Alpha de la pantalla negra hasta 1
+        
         while (pantallaNegra.alpha < 1)
         {
             pantallaNegra.alpha += Time.deltaTime * velocidadTransicion;
             yield return null;
         }
 
-        // Una pausa chiquitica para que se sienta bien dramático antes de cargar
+        
         yield return new WaitForSeconds(0.5f);
 
-        // ¡Boom! Cambiamos de escena
+       
         SceneManager.LoadScene(nombreEscenaACargar);
     }
 }

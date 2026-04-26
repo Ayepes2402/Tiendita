@@ -7,11 +7,11 @@ using UnityEngine.UI;
 public class EfectoDialogo : MonoBehaviour
 {
     [Header("Referencias UI - Texto FIJO")]
-    public TextMeshProUGUI textoFijo; // Aquí dirá "DÍA X"
+    public TextMeshProUGUI textoFijo; 
     public float velocidadFadeInFijo = 1f;
 
     [Header("Referencias UI - Texto ANIMADO")]
-    public TextMeshProUGUI textoDialogoAnimado; // Aquí se escribe la REGLA
+    public TextMeshProUGUI textoDialogoAnimado; 
     public GameObject botonFlecha;
 
     [Header("Botón Nueva Escena")]
@@ -26,8 +26,8 @@ public class EfectoDialogo : MonoBehaviour
     public float velocidadFadeBoton = 1.5f;
 
     [Header("Sonidos")]
-    public AudioSource audioSourceEfectos; // El parlante para el click del botón
-    public AudioClip sonidoClickNormal;    // El sonido del click
+    public AudioSource audioSourceEfectos; 
+    public AudioClip sonidoClickNormal;    
 
     private string textoDeLaRegla;
     private bool estaEscribiendo = false;
@@ -36,10 +36,10 @@ public class EfectoDialogo : MonoBehaviour
 
     void Start()
     {
-        // --- CONFIGURACIÓN DINÁMICA ---
+       
         if (GameManager.Instance != null)
         {
-            // Sumamos 1 porque el GameManager guarda el día que ACABAMOS de terminar
+            
             int proximoDia = GameManager.Instance.dia + 1;
 
             if (textoFijo != null) textoFijo.text = "DIA " + proximoDia;
@@ -51,7 +51,7 @@ public class EfectoDialogo : MonoBehaviour
             textoDeLaRegla = "Error: No se encontró el GameManager.";
         }
 
-        // --- INICIALIZACIÓN VISUAL ---
+        
         botonFlecha.SetActive(false);
         if (grupoBotonEscena != null) { grupoBotonEscena.alpha = 0; grupoBotonEscena.interactable = false; }
         if (pantallaNegra != null) { pantallaNegra.alpha = 0; }
@@ -65,7 +65,7 @@ public class EfectoDialogo : MonoBehaviour
         StartCoroutine(SecuenciaIntro());
     }
 
-    // --- EL CORAZÓN DE TU IDEA: LAS REGLAS DINÁMICAS ---
+    
     string ObtenerTextoSegunDia(int d)
     {
         switch (d)
@@ -89,7 +89,7 @@ public class EfectoDialogo : MonoBehaviour
 
     IEnumerator SecuenciaIntro()
     {
-        // Fade in de "DÍA X"
+        
         if (textoFijo != null)
         {
             while (textoFijo.color.a < 1)
@@ -102,7 +102,7 @@ public class EfectoDialogo : MonoBehaviour
         }
         textoFijoCompletado = true;
 
-        // Empezar a escribir la regla
+       
         corrutinaEscritura = StartCoroutine(EscribirTexto());
     }
 
@@ -110,7 +110,7 @@ public class EfectoDialogo : MonoBehaviour
     {
         estaEscribiendo = true;
 
-        // --- PRENDEMOS EL AUDIO DEL DIÁLOGO ---
+        
         if (AudioManager.instancia != null) AudioManager.instancia.ReproducirDialogo();
 
         textoDialogoAnimado.text = textoDeLaRegla;
@@ -125,7 +125,7 @@ public class EfectoDialogo : MonoBehaviour
             yield return new WaitForSeconds(velocidadEscritura);
         }
 
-        // --- APAGAMOS EL AUDIO AL TERMINAR ---
+        
         if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
 
         estaEscribiendo = false;
@@ -138,7 +138,7 @@ public class EfectoDialogo : MonoBehaviour
         {
             StopCoroutine(corrutinaEscritura);
 
-            // --- APAGAMOS EL AUDIO SI EL JUGADOR SALTA LA ANIMACIÓN ---
+            
             if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
 
             textoDialogoAnimado.maxVisibleCharacters = textoDialogoAnimado.textInfo.characterCount;
@@ -162,10 +162,10 @@ public class EfectoDialogo : MonoBehaviour
         }
     }
 
-    // Este método lo conectas al OnClick() de tu botón "Continuar"
+    
     public void ClickContinuar()
     {
-        // --- SONIDO AL DAR CLIC EN CONTINUAR ---
+        
         if (audioSourceEfectos != null && sonidoClickNormal != null)
         {
             audioSourceEfectos.PlayOneShot(sonidoClickNormal);
@@ -183,7 +183,7 @@ public class EfectoDialogo : MonoBehaviour
             yield return null;
         }
 
-        // Llamamos al GameManager para que aumente el día y cargue la tienda
+        
         GameManager.Instance.IniciarSiguienteDia();
     }
 }

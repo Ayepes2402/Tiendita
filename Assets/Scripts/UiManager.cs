@@ -28,7 +28,7 @@ public class UIManager : MonoBehaviour
     public AudioSource audioSourceMusica;
     public AudioSource audioSourceEfectos;
     public AudioClip sonidoClick;
-    public AudioClip sonidoGanarPlata; // <-- NUEVO: El sonidito de las monedas
+    public AudioClip sonidoGanarPlata; 
 
     [Header("Referencias del Cliente")]
     public TextMeshProUGUI textoCliente;
@@ -78,7 +78,7 @@ public class UIManager : MonoBehaviour
         if (burbujaDialogo != null) burbujaDialogo.SetActive(false);
         if (textoCliente != null) textoCliente.text = "";
 
-        // --- LÓGICA DE VOLUMEN COMPARTIDO ---
+   
         if (sliderVolumen != null)
         {
             float volumenGuardado = PlayerPrefs.GetFloat("VolumenJuego", 0.75f);
@@ -95,7 +95,7 @@ public class UIManager : MonoBehaviour
         ActualizarUI();
     }
 
-    // --- MÉTODOS DE SONIDO Y AJUSTES ---
+ 
 
     public void ReproducirClick()
     {
@@ -123,7 +123,7 @@ public class UIManager : MonoBehaviour
         PlayerPrefs.SetFloat("VolumenJuego", volumen);
     }
 
-    // ------------------------------------------
+
 
     public void MostrarCliente(Cliente cliente)
     {
@@ -325,8 +325,7 @@ public class UIManager : MonoBehaviour
 
     public void IntentarVender(string producto)
     {
-        // NOTA: Aquí no reproducimos click normal porque ya va a sonar la plata (o el error si falla), 
-        // así evitamos que suenen dos cosas al mismo tiempo y se sature.
+        
         if (GameManager.Instance != null) GameManager.Instance.IntentarVender(producto);
     }
 
@@ -336,16 +335,16 @@ public class UIManager : MonoBehaviour
         if (GameManager.Instance != null) GameManager.Instance.ReiniciarJuego();
     }
 
-    // --- AQUÍ AÑADIMOS LA MAGIA DE LA PLATA ---
+  
     public void MostrarGanancia(int cantidad)
     {
-        // 1. Reproducimos el sonido de corona coronada
+        
         if (audioSourceEfectos != null && sonidoGanarPlata != null)
         {
             audioSourceEfectos.PlayOneShot(sonidoGanarPlata);
         }
 
-        // 2. Mostramos los numeritos verdes volando (tu código original)
+       
         if (prefabTextoGanancia != null && puntoAparicionGanancia != null)
         {
             GameObject nuevoEfecto = Instantiate(prefabTextoGanancia, puntoAparicionGanancia);

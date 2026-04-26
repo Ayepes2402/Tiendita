@@ -7,7 +7,7 @@ public class DropUICliente : MonoBehaviour, IDropHandler
 
     private void Start()
     {
-        // Busca al jefe pa' no tener que arrastrar chimbadas en el Inspector
+        
         gameManager = FindObjectOfType<GameManager>();
     }
 
@@ -17,13 +17,13 @@ public class DropUICliente : MonoBehaviour, IDropHandler
         {
             DragUICategoria categoria = eventData.pointerDrag.GetComponent<DragUICategoria>();
 
-            // ¡PILLE ACÁ EL CAMBIO! Ahora llama a ObtenerUnidadesReales()
+            
             if (categoria != null && categoria.ObtenerUnidadesReales() > 0 && gameManager != null)
             {
-                // Le pasamos el chisme al GameManager de qué fue lo que le tiraron
+                
                 gameManager.IntentarVender(categoria.nombreProducto);
 
-                // Restamos la vuelta de la repisa
+                
                 categoria.RestarInventario();
             }
         }

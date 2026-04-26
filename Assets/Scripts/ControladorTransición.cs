@@ -24,7 +24,7 @@ public class ControladorTransicion : MonoBehaviour
 
             textoTituloDiaSiguiente.text = "DÍA " + proximoDia;
 
-            // ACTUALIZACIÓN: Aquí incluimos la Deuda (Cuota) y los Precios de Reabastecimiento
+            
             textoResumenDinero.text =
                 "Dinero actual: $" + GameManager.Instance.dinero +
                 "\nCuota Pendiente: $" + GameManager.Instance.deuda +
@@ -45,7 +45,7 @@ public class ControladorTransicion : MonoBehaviour
         }
     }
 
-    // ... (Mantén tu función EscribirReglaAnimada y ObtenerReglasSegunDia igual)
+   
 
     IEnumerator EscribirReglaAnimada()
     {
