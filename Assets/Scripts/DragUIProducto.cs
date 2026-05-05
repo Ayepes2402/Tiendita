@@ -70,25 +70,38 @@ public class DragUICategoria : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         ActualizarTextoDesdeBackend();
     }
 
+   
     public void ActualizarTextoDesdeBackend()
     {
-        if (gameManager == null) return;
+        if (gameManager == null) gameManager = FindObjectOfType<GameManager>();
+        if (gameManager == null || gameManager.ObtenerInventario() == null) return;
 
-        int unidadesReales = ObtenerUnidadesReales();
+  
+        var producto = gameManager.ObtenerInventario().ObtenerProducto(nombreProducto);
 
-        if (textoContador != null)
+        if (producto != null)
         {
-            textoContador.text = unidadesReales.ToString();
-        }
+            int unidadesReales = producto.Cantidad;
 
-       
-        if (unidadesReales <= 0)
-        {
-            miImagen.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+          
+            if (textoContador != null)
+            {
+                textoContador.text = unidadesReales.ToString();
+            }
+
+            
+            if (unidadesReales <= 0)
+            {
+                miImagen.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+            }
+            else
+            {
+                miImagen.color = Color.white;
+            }
         }
     }
 
-    
+
     public int ObtenerUnidadesReales()
     {
         if (gameManager != null && gameManager.ObtenerInventario() != null)

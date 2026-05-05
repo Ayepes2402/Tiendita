@@ -20,18 +20,19 @@ public class ControladorTransicion : MonoBehaviour
 
         if (GameManager.Instance != null)
         {
-            int proximoDia = GameManager.Instance.dia + 1;
+            // Corregido: dia -> Dia
+            int proximoDia = GameManager.Instance.Dia + 1;
 
             textoTituloDiaSiguiente.text = "DÍA " + proximoDia;
 
-            
+            // Corregido: Todas las propiedades ahora inician con Mayúscula
             textoResumenDinero.text =
-                "Dinero actual: $" + GameManager.Instance.dinero +
-                "\nCuota Pendiente: $" + GameManager.Instance.deuda +
+                "Dinero actual: $" + GameManager.Instance.Dinero +
+                "\nCuota Pendiente: $" + GameManager.Instance.Deuda +
                 "\n\nPrecios de Hoy: \n" +
-                "- Pan: $" + GameManager.Instance.costoCompraPan +
-                " - Leche: $" + GameManager.Instance.costoCompraLeche +
-                " - Huevos: $" + GameManager.Instance.costoCompraHuevos;
+                "- Pan: $" + GameManager.Instance.CostoCompraPan +
+                " - Leche: $" + GameManager.Instance.CostoCompraLeche +
+                " - Huevos: $" + GameManager.Instance.CostoCompraHuevos;
 
             historiaDelDia = ObtenerReglasSegunDia(proximoDia);
             StartCoroutine(EscribirReglaAnimada());
@@ -44,8 +45,6 @@ public class ControladorTransicion : MonoBehaviour
             StartCoroutine(EscribirReglaAnimada());
         }
     }
-
-   
 
     IEnumerator EscribirReglaAnimada()
     {

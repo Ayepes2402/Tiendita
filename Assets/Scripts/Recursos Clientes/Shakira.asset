@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5b303946b149d14f848fb5b2389238f, type: 3}
+  m_Name: Shakira
+  m_EditorClassIdentifier: 
+  nombre: Shakira
+  tipo: 0
+  productoPedido: pan
+  dinero: 28
+  spriteIndex: 14
+  frasePedido: Las mujeres ya no lloran, las mujeres facturan... y comen pan.
+  opcion1: Claro, loba. Toma tu pan.
+  opcion2: "Salpique de aqu\xED."
+  respuesta1: "\xA1Auuu! Gracias."
+  respuesta2: "Te felicito, qu\xE9 bien act\xFAas."

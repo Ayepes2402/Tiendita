@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5b303946b149d14f848fb5b2389238f, type: 3}
+  m_Name: Bob
+  m_EditorClassIdentifier: 
+  nombre: Bob
+  tipo: 0
+  productoPedido: huevos
+  dinero: 25
+  spriteIndex: 2
+  frasePedido: "\xA1Bello! Mi want huevo, tankiu"
+  opcion1: "\xA1Bananas y huevos listos!"
+  opcion2: No hablo Minion
+  respuesta1: "\xA1Papaguena! Jeje."
+  respuesta2: "\xA1Fuchi! Qu\xE9 aburrido."

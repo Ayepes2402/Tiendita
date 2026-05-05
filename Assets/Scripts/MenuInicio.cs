@@ -17,14 +17,13 @@ public class MenuInicio : MonoBehaviour
 
     private void Start()
     {
-       
+        
         if (GameManager.Instance != null)
         {
             Destroy(GameManager.Instance.gameObject);
-            GameManager.Instance = null;
+           
         }
 
-       
         if (panelAjustes != null) panelAjustes.SetActive(false);
 
         if (sliderVolumen != null)
@@ -49,12 +48,9 @@ public class MenuInicio : MonoBehaviour
         }
     }
 
-
-
     public void BotonJugar()
     {
         ReproducirClick();
-       
         Invoke("CargarLore", 0.15f);
     }
 

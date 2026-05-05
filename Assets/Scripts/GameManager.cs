@@ -4,40 +4,43 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+  
+    public static GameManager Instance { get; private set; }
 
-    public static GameManager Instance;
-
-    private Cliente clienteActual;
-    private ClienteGenerator generador;
+    [Header("Referencias")]
+    [SerializeField] private ClienteGenerator generador;
     private UIManager uiManager;
     private Inventario inventario;
     private VentaService ventaService;
     private ReglaGobierno reglaDelDia;
 
-    private List<Cliente> clientesDelDia;
+   
+    private List<ClienteData> clientesDelDia;
+    private ClienteData clienteActual;
+
     private int indiceClienteActualDelDia;
     private int clientesAtendidosHoy;
     private string eventoDelDiaActual = "";
 
 
-    [System.NonSerialized] public int dinero = 0;
-    [System.NonSerialized] public int deuda = 6500;
-    [System.NonSerialized] public int dia = 0;
-    [System.NonSerialized] public int diasMaximos = 5;
+    public int Dinero { get; private set; }
+    public int Dia { get; private set; }
+    public int Amonestaciones { get; private set; }
 
-    [System.NonSerialized] public int dineroInicial = 1500;
-    [System.NonSerialized] public int amonestaciones = 0;
-    [System.NonSerialized] public int maxAmonestaciones = 3;
-    [System.NonSerialized] public int clientesPorDia = 11;
-    [System.NonSerialized] public int metaMinimaDiaria = 20;
+   
+    public int Deuda { get; private set; } = 6500;
+    public int MaxAmonestaciones { get; private set; } = 3;
+    public int CostoCompraPan { get; private set; } = 300;
+    public int CostoCompraLeche { get; private set; } = 500;
+    public int CostoCompraHuevos { get; private set; } = 400;
 
-    [System.NonSerialized] public int costoCompraPan = 300;
-    [System.NonSerialized] public int costoCompraLeche = 500;
-    [System.NonSerialized] public int costoCompraHuevos = 400;
+    private int diasMaximos = 5;
+    private int dineroInicial = 1500;
+    private int metaMinimaDiaria = 20;
 
-    private bool juegoTerminado = false;
-    private string ultimoMensajeEvento = "";
-    private int dineroGanadoEnElDia = 0;
+    public bool juegoTerminado = false;
+    public string ultimoMensajeEvento = "";
+    public int dineroGanadoEnElDia = 0;
 
     private void Awake()
     {
@@ -45,8 +48,6 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-
-           
             InicializarComponentesBase();
         }
         else
@@ -58,137 +59,182 @@ public class GameManager : MonoBehaviour
 
     private void InicializarComponentesBase()
     {
-        diasMaximos = 5;
-
         inventario = new Inventario(new List<Producto> {
-            new Producto("pan", 600, 3, CategoriaProducto.Basico),
-            new Producto("leche", 800, 0, CategoriaProducto.Lacteo),
-            new Producto("huevos", 1000, 1, CategoriaProducto.Proteina)
-        });
+       
+        new Producto("pan", 600, 5, CategoriaProducto.Basico),
+        new Producto("leche", 800, 5, CategoriaProducto.Lacteo), 
+        new Producto("huevos", 1000, 5, CategoriaProducto.Proteina)
+    });
 
         ventaService = new VentaService(inventario);
-        generador = new ClienteGenerator();
 
-        dinero = dineroInicial;
-        dia = 0; 
+        Dinero = dineroInicial;
+        Dia = 0;
         juegoTerminado = false;
     }
 
-   
     void OnEnable()
     {
-        if (Instance == this)
-        {
-            SceneManager.sceneLoaded += AlCargarEscena;
-        }
+        if (Instance == this) SceneManager.sceneLoaded += AlCargarEscena;
     }
 
     void OnDisable()
     {
-        if (Instance == this)
-        {
-            SceneManager.sceneLoaded -= AlCargarEscena;
-        }
+        if (Instance == this) SceneManager.sceneLoaded -= AlCargarEscena;
     }
 
     private void AlCargarEscena(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "Escena_Tienda")
         {
-            uiManager = FindObjectOfType<UIManager>();
+            uiManager = FindObjectOfType<UIManager>(); 
+        
+        
+        if (generador == null)
+            {
+                generador = FindObjectOfType<ClienteGenerator>(); 
+        }
+
             if (uiManager != null)
             {
-                PrepararDia(dia);
-            }
+                PrepararDia(Dia); 
+        }
         }
     }
 
     private void PrepararDia(int nuevoDia)
     {
-        dia = nuevoDia;
+        Dia = nuevoDia;
         clientesAtendidosHoy = 0;
         indiceClienteActualDelDia = 0;
-        amonestaciones = 0;
+        Amonestaciones = 0;
         dineroGanadoEnElDia = 0;
 
         List<string> prohibidos = new List<string>();
 
-        if (dia == 1) prohibidos.Add("leche");
-        else if (dia == 2) prohibidos.Add("huevos");
-        else if (dia == 3) prohibidos.Add("pan");
-        else if (dia == 4) { prohibidos.Add("leche"); prohibidos.Add("huevos"); }
-        else if (dia >= 5) { prohibidos.Add("huevos"); prohibidos.Add("pan"); }
+       
+        if (Dia == 1) prohibidos.Add("leche");
+        else if (Dia == 2) prohibidos.Add("huevos");
+        else if (Dia == 3) prohibidos.Add("pan");
+        else if (Dia == 4) { prohibidos.Add("leche"); prohibidos.Add("huevos"); }
+        else if (Dia >= 5) { prohibidos.Add("huevos"); prohibidos.Add("pan"); }
 
         reglaDelDia = new ReglaGobierno(prohibidos);
         eventoDelDiaActual = "PROHIBIDO: " + reglaDelDia.ObtenerListaProhibida().ToUpper();
 
-      
-        clientesDelDia = generador.ObtenerClientesDelDia(dia, prohibidos);
+    
+        if (generador != null)
+        {
+            clientesDelDia = generador.ObtenerClientesDelDia(Dia);
+        }
+        else
+        {
+            Debug.LogError("Falta asignar el GeneradorClientes en el Inspector.");
+        }
 
         if (uiManager != null)
         {
             uiManager.ActualizarUI();
-            uiManager.MostrarAvisoDia("Día " + dia + ". " + eventoDelDiaActual);
+            uiManager.MostrarAvisoDia("Día " + Dia + ". " + eventoDelDiaActual);
         }
         MostrarClienteActual();
     }
+
+
+    private string ObtenerProductoRealDelCliente()
+    {
+        string productoPedido = clienteActual.ProductoPedido;
+
+       
+        if (productoPedido == "trampa")
+        {
+            if (Dia == 1) productoPedido = "leche";
+            else if (Dia == 2) productoPedido = "huevos";
+            else if (Dia == 3) productoPedido = "pan";
+            else if (Dia == 4) productoPedido = "leche"; 
+            else if (Dia >= 5) productoPedido = "huevos"; 
+        }
+
+        return productoPedido;
+    }
+
+  
 
     public void IntentarVender(string productoEntregado)
     {
         if (juegoTerminado || clienteActual == null) return;
 
-        if (productoEntregado != clienteActual.ProductoPedido)
+        string productoQueQuiere = ObtenerProductoRealDelCliente();
+
+        if (productoEntregado != productoQueQuiere)
         {
             SumarAmonestacion("¡Error! Producto equivocado.", 0);
         }
         else if (!reglaDelDia.PuedeVender(productoEntregado))
         {
-            if (ventaService.RealizarVenta(clienteActual))
-            {
-                int precio = inventario.ObtenerProducto(productoEntregado).Precio;
-                dinero += precio;
-                dineroGanadoEnElDia += precio;
+           
+            Cliente clienteTemp = new Cliente(clienteActual.Nombre, clienteActual.Tipo, productoEntregado, clienteActual.Dinero, "", 0);
 
-                if (uiManager != null) uiManager.MostrarGanancia(precio);
-                SumarAmonestacion("Venta ilegal realizada.", 0);
+            if (ventaService.RealizarVenta(clienteTemp))
+            {
+                int precioBase = inventario.ObtenerProducto(productoEntregado).Precio;
+                int pagoFinal = precioBase;
+
+                
+                if (clienteActual.Tipo == TipoCliente.Sospechoso)
+                {
+                    pagoFinal *= 2;
+                    ultimoMensajeEvento = "¡Venta ilegal de alto riesgo! Pago doble.";
+                }
+                else
+                {
+                    ultimoMensajeEvento = "Venta ilegal realizada.";
+                }
+
+                Dinero += pagoFinal;
+                dineroGanadoEnElDia += pagoFinal;
+
+                if (uiManager != null) uiManager.MostrarGanancia(pagoFinal);
+                SumarAmonestacion(ultimoMensajeEvento, 0);
             }
+            else ultimoMensajeEvento = "Sin stock.";
         }
         else
         {
-            if (ventaService.RealizarVenta(clienteActual))
+           
+            Cliente clienteTemp = new Cliente(clienteActual.Nombre, clienteActual.Tipo, productoEntregado, clienteActual.Dinero, "", 0);
+            if (ventaService.RealizarVenta(clienteTemp))
             {
                 int precio = inventario.ObtenerProducto(productoEntregado).Precio;
-                dinero += precio;
+                Dinero += precio;
                 dineroGanadoEnElDia += precio;
-
                 if (uiManager != null) uiManager.MostrarGanancia(precio);
                 ultimoMensajeEvento = "Venta exitosa.";
             }
             else ultimoMensajeEvento = "Sin stock.";
         }
         FinalizarTurno();
+        ActualizarContadoresVisuales();
+    }
+
+    private void ActualizarContadoresVisuales()
+    {
+       
+        DragUICategoria[] iconos = FindObjectsOfType<DragUICategoria>();
+        foreach (DragUICategoria icono in iconos)
+        {
+            icono.ActualizarTextoDesdeBackend(); 
+    }
     }
 
     public void BotonRechazar()
     {
-        Debug.Log("🕵️‍♂️ 1. El GameManager recibió la orden de rechazar.");
+        if (juegoTerminado || clienteActual == null) return;
 
-        if (juegoTerminado)
-        {
-            Debug.Log("❌ Cancelado: El juego ya terminó.");
-            return;
-        }
+        string productoQueQuiere = ObtenerProductoRealDelCliente();
 
-        if (clienteActual == null)
-        {
-            Debug.Log("❌ Cancelado: El GameManager cree que clienteActual es NULO.");
-            return;
-        }
-
-        Debug.Log("✅ 2. Todo en orden, procediendo a rechazar al cliente.");
-
-        bool esProhibido = !reglaDelDia.PuedeVender(clienteActual.ProductoPedido);
-        bool sinStock = !inventario.TieneProducto(clienteActual.ProductoPedido);
+        bool esProhibido = !reglaDelDia.PuedeVender(productoQueQuiere);
+        bool sinStock = !inventario.TieneProducto(productoQueQuiere);
 
         if (esProhibido || sinStock)
             ultimoMensajeEvento = "Rechazo correcto.";
@@ -222,7 +268,11 @@ public class GameManager : MonoBehaviour
         if (indiceClienteActualDelDia < clientesDelDia.Count)
         {
             clienteActual = clientesDelDia[indiceClienteActualDelDia];
-            if (uiManager != null) uiManager.MostrarCliente(clienteActual);
+
+            string productoReal = ObtenerProductoRealDelCliente();
+
+          
+            if (uiManager != null) uiManager.MostrarCliente(clienteActual, productoReal);
         }
     }
 
@@ -230,39 +280,31 @@ public class GameManager : MonoBehaviour
     {
         if (uiManager != null) uiManager.MostrarCliente(null);
 
-        if (dia >= 5)
+        if (Dia >= 5)
         {
-            bool gano = dinero >= deuda;
-
-            if (gano)
-            {
-                
-                SceneManager.LoadScene("EscenaGanasteJuego");
-            }
+            bool gano = Dinero >= Deuda;
+            if (gano) SceneManager.LoadScene("EscenaGanasteJuego");
             else
             {
-                
                 juegoTerminado = true;
                 SceneManager.LoadScene("Escena de Gameover por no pagar la deuda");
             }
         }
         else
         {
-            
             SceneManager.LoadScene("Escena_FinDeDia");
         }
     }
 
-
     public bool ComprarArticulo(string nombreProducto, int costo)
     {
-        if (dinero >= costo)
+        if (Dinero >= costo)
         {
             Producto p = inventario.ObtenerProducto(nombreProducto);
             if (p != null)
             {
                 p.AumentarStock(1);
-                dinero -= costo;
+                Dinero -= costo;
                 return true;
             }
         }
@@ -271,31 +313,20 @@ public class GameManager : MonoBehaviour
 
     public void IniciarSiguienteDia()
     {
-        dia++;
+        Dia++;
         SceneManager.LoadScene("Escena_Tienda");
     }
 
     private void SumarAmonestacion(string motivo, int multa)
     {
-        amonestaciones++;
-        dinero -= multa;
-        ultimoMensajeEvento = motivo + " (Faltas: " + amonestaciones + "/" + maxAmonestaciones + ")";
+        Amonestaciones++;
+        Dinero -= multa;
+        ultimoMensajeEvento = motivo + " (Faltas: " + Amonestaciones + "/" + MaxAmonestaciones + ")";
 
-        if (amonestaciones >= maxAmonestaciones)
+        if (Amonestaciones >= MaxAmonestaciones)
         {
-            
             juegoTerminado = true;
             SceneManager.LoadScene("Escena de Gameover por amonestaciones");
-        }
-    }
-
-    private void FinJuego(bool muerto, string m)
-    {
-        juegoTerminado = true;
-        if (uiManager != null)
-        {
-            uiManager.MostrarCliente(null);
-            uiManager.MostrarGameOver(m);
         }
     }
 

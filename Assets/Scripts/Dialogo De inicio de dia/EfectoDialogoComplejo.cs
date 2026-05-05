@@ -7,11 +7,11 @@ using UnityEngine.UI;
 public class EfectoDialogo : MonoBehaviour
 {
     [Header("Referencias UI - Texto FIJO")]
-    public TextMeshProUGUI textoFijo; 
+    public TextMeshProUGUI textoFijo;
     public float velocidadFadeInFijo = 1f;
 
     [Header("Referencias UI - Texto ANIMADO")]
-    public TextMeshProUGUI textoDialogoAnimado; 
+    public TextMeshProUGUI textoDialogoAnimado;
     public GameObject botonFlecha;
 
     [Header("Botón Nueva Escena")]
@@ -26,8 +26,8 @@ public class EfectoDialogo : MonoBehaviour
     public float velocidadFadeBoton = 1.5f;
 
     [Header("Sonidos")]
-    public AudioSource audioSourceEfectos; 
-    public AudioClip sonidoClickNormal;    
+    public AudioSource audioSourceEfectos;
+    public AudioClip sonidoClickNormal;
 
     private string textoDeLaRegla;
     private bool estaEscribiendo = false;
@@ -36,11 +36,11 @@ public class EfectoDialogo : MonoBehaviour
 
     void Start()
     {
-       
+
         if (GameManager.Instance != null)
         {
-            
-            int proximoDia = GameManager.Instance.dia + 1;
+            // Corregido: dia -> Dia
+            int proximoDia = GameManager.Instance.Dia + 1;
 
             if (textoFijo != null) textoFijo.text = "DIA " + proximoDia;
 
@@ -51,7 +51,6 @@ public class EfectoDialogo : MonoBehaviour
             textoDeLaRegla = "Error: No se encontró el GameManager.";
         }
 
-        
         botonFlecha.SetActive(false);
         if (grupoBotonEscena != null) { grupoBotonEscena.alpha = 0; grupoBotonEscena.interactable = false; }
         if (pantallaNegra != null) { pantallaNegra.alpha = 0; }
@@ -65,7 +64,6 @@ public class EfectoDialogo : MonoBehaviour
         StartCoroutine(SecuenciaIntro());
     }
 
-    
     string ObtenerTextoSegunDia(int d)
     {
         switch (d)
@@ -89,7 +87,6 @@ public class EfectoDialogo : MonoBehaviour
 
     IEnumerator SecuenciaIntro()
     {
-        
         if (textoFijo != null)
         {
             while (textoFijo.color.a < 1)
@@ -102,7 +99,6 @@ public class EfectoDialogo : MonoBehaviour
         }
         textoFijoCompletado = true;
 
-       
         corrutinaEscritura = StartCoroutine(EscribirTexto());
     }
 
@@ -110,7 +106,6 @@ public class EfectoDialogo : MonoBehaviour
     {
         estaEscribiendo = true;
 
-        
         if (AudioManager.instancia != null) AudioManager.instancia.ReproducirDialogo();
 
         textoDialogoAnimado.text = textoDeLaRegla;
@@ -125,7 +120,6 @@ public class EfectoDialogo : MonoBehaviour
             yield return new WaitForSeconds(velocidadEscritura);
         }
 
-        
         if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
 
         estaEscribiendo = false;
@@ -138,7 +132,6 @@ public class EfectoDialogo : MonoBehaviour
         {
             StopCoroutine(corrutinaEscritura);
 
-            
             if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
 
             textoDialogoAnimado.maxVisibleCharacters = textoDialogoAnimado.textInfo.characterCount;
@@ -162,10 +155,8 @@ public class EfectoDialogo : MonoBehaviour
         }
     }
 
-    
     public void ClickContinuar()
     {
-        
         if (audioSourceEfectos != null && sonidoClickNormal != null)
         {
             audioSourceEfectos.PlayOneShot(sonidoClickNormal);
@@ -183,7 +174,6 @@ public class EfectoDialogo : MonoBehaviour
             yield return null;
         }
 
-        
         GameManager.Instance.IniciarSiguienteDia();
     }
 }

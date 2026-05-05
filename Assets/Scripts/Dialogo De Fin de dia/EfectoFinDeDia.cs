@@ -33,10 +33,10 @@ public class EfectoFinDeDia : MonoBehaviour
     public float velocidadTransicionNegra = 2f;
 
     [Header("Sonidos")]
-    public AudioSource audioSourceEfectos; 
-    public AudioClip sonidoComprar;        
-    public AudioClip sonidoError;          
-    public AudioClip sonidoClickNormal;    
+    public AudioSource audioSourceEfectos;
+    public AudioClip sonidoComprar;
+    public AudioClip sonidoError;
+    public AudioClip sonidoClickNormal;
 
     private Color colorOriginalTexto = Color.white;
 
@@ -46,11 +46,13 @@ public class EfectoFinDeDia : MonoBehaviour
 
         if (GameManager.Instance != null)
         {
+            // Corregido: dia -> Dia
             if (textoTituloResumen != null)
-                textoTituloResumen.text = "RESUMEN DEL DIA " + GameManager.Instance.dia;
+                textoTituloResumen.text = "RESUMEN DEL DIA " + GameManager.Instance.Dia;
 
+            // Corregido: amonestaciones -> Amonestaciones, maxAmonestaciones -> MaxAmonestaciones
             textoDelResumen = "Dinero ganado hoy: $" + GameManager.Instance.ObtenerDineroGanadoEnElDia() +
-                              "\n\nFaltas del gobierno: " + GameManager.Instance.amonestaciones + " / " + GameManager.Instance.maxAmonestaciones;
+                              "\n\nFaltas del gobierno: " + GameManager.Instance.Amonestaciones + " / " + GameManager.Instance.MaxAmonestaciones;
 
             ActualizarTextosTienda();
         }
@@ -106,7 +108,6 @@ public class EfectoFinDeDia : MonoBehaviour
     {
         estaEscribiendo = true;
 
-      
         if (AudioManager.instancia != null) AudioManager.instancia.ReproducirDialogo();
 
         textoResumenAnimado.text = textoDelResumen;
@@ -121,7 +122,6 @@ public class EfectoFinDeDia : MonoBehaviour
             yield return new WaitForSeconds(velocidadEscritura);
         }
 
-       
         if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
 
         estaEscribiendo = false;
@@ -134,7 +134,6 @@ public class EfectoFinDeDia : MonoBehaviour
         {
             StopCoroutine(corrutinaEscritura);
 
-            
             if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
 
             textoResumenAnimado.maxVisibleCharacters = textoResumenAnimado.textInfo.characterCount;
@@ -162,27 +161,29 @@ public class EfectoFinDeDia : MonoBehaviour
     {
         if (GameManager.Instance == null) return;
 
+        // Corregido: dinero -> Dinero
         if (textoSaldoTotal != null)
-            textoSaldoTotal.text = "TU SALDO ACTUAL: $" + GameManager.Instance.dinero;
+            textoSaldoTotal.text = "TU SALDO ACTUAL: $" + GameManager.Instance.Dinero;
 
         Inventario inv = GameManager.Instance.ObtenerInventario();
         if (inv != null)
         {
+            // Corregidos: costoCompra... -> CostoCompra...
             if (infoPan != null)
-                infoPan.text = "Stock de pan: " + inv.ObtenerProducto("pan").Cantidad + " | Precio: $" + GameManager.Instance.costoCompraPan;
+                infoPan.text = "Stock de pan: " + inv.ObtenerProducto("pan").Cantidad + " | Precio: $" + GameManager.Instance.CostoCompraPan;
 
             if (infoLeche != null)
-                infoLeche.text = "Stock de leche: " + inv.ObtenerProducto("leche").Cantidad + " | Precio: $" + GameManager.Instance.costoCompraLeche;
+                infoLeche.text = "Stock de leche: " + inv.ObtenerProducto("leche").Cantidad + " | Precio: $" + GameManager.Instance.CostoCompraLeche;
 
             if (infoHuevos != null)
-                infoHuevos.text = "Stock de huevos: " + inv.ObtenerProducto("huevos").Cantidad + " | Precio: $" + GameManager.Instance.costoCompraHuevos;
+                infoHuevos.text = "Stock de huevos: " + inv.ObtenerProducto("huevos").Cantidad + " | Precio: $" + GameManager.Instance.CostoCompraHuevos;
         }
     }
 
-   
     public void ComprarPan()
     {
-        if (GameManager.Instance.ComprarArticulo("pan", GameManager.Instance.costoCompraPan))
+        // Corregido: costoCompraPan -> CostoCompraPan
+        if (GameManager.Instance.ComprarArticulo("pan", GameManager.Instance.CostoCompraPan))
         {
             if (audioSourceEfectos != null && sonidoComprar != null) audioSourceEfectos.PlayOneShot(sonidoComprar);
             ActualizarTextosTienda();
@@ -196,7 +197,8 @@ public class EfectoFinDeDia : MonoBehaviour
 
     public void ComprarLeche()
     {
-        if (GameManager.Instance.ComprarArticulo("leche", GameManager.Instance.costoCompraLeche))
+        // Corregido: costoCompraLeche -> CostoCompraLeche
+        if (GameManager.Instance.ComprarArticulo("leche", GameManager.Instance.CostoCompraLeche))
         {
             if (audioSourceEfectos != null && sonidoComprar != null) audioSourceEfectos.PlayOneShot(sonidoComprar);
             ActualizarTextosTienda();
@@ -210,7 +212,8 @@ public class EfectoFinDeDia : MonoBehaviour
 
     public void ComprarHuevos()
     {
-        if (GameManager.Instance.ComprarArticulo("huevos", GameManager.Instance.costoCompraHuevos))
+        // Corregido: costoCompraHuevos -> CostoCompraHuevos
+        if (GameManager.Instance.ComprarArticulo("huevos", GameManager.Instance.CostoCompraHuevos))
         {
             if (audioSourceEfectos != null && sonidoComprar != null) audioSourceEfectos.PlayOneShot(sonidoComprar);
             ActualizarTextosTienda();
