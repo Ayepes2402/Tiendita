@@ -151,6 +151,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15fd4e1dd6f30854fb25ce75c8901c55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  generador: {fileID: 0}
+  diasMaximos: 5
+  dineroInicial: 1500
+  metaMinimaDiaria: 20
 --- !u!4 &73436062
 Transform:
   m_ObjectHideFlags: 0
@@ -413,7 +417,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -760.0731, y: -491.40295}
+  m_AnchoredPosition: {x: -763.93, y: -381}
   m_SizeDelta: {x: 207.8537, y: 47.1941}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &982124473

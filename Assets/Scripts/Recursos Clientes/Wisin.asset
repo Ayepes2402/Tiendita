@@ -17,7 +17,7 @@ MonoBehaviour:
   productoPedido: trampa
   dinero: 22
   spriteIndex: 8
-  frasePedido: W, el machucapan. Mera, dame [producto] caleta
+  frasePedido: W, el machucapan. Mera, dame [producto] caleta. Te doy propina
   opcion1: Tome su caleta.
   opcion2: "Hable bien, se\xF1or."
   respuesta1: Doble U y Yandel, duro.

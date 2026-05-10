@@ -17,7 +17,7 @@ MonoBehaviour:
   productoPedido: trampa
   dinero: 22
   spriteIndex: 9
-  frasePedido: Rakata rakata, dame, dame, dame [producto]
+  frasePedido: Rakata rakata, dame, dame, dame [producto] . Al x2 o que
   opcion1: Rakata, tome
   opcion2: "Mucho ruido aqu\xED."
   respuesta1: "\xA1Los extraterrestres!"

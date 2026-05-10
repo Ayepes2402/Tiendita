@@ -14,8 +14,8 @@ public class EfectoMaquinaDeEscribir : MonoBehaviour
     public string nombreEscenaACargar;
 
     [Header("Transición de Escena")]
-    public CanvasGroup pantallaNegra; 
-    public float velocidadTransicion = 2f; 
+    public CanvasGroup pantallaNegra;
+    public float velocidadTransicion = 2f;
 
     [Header("Configuración")]
     [TextArea(3, 10)]
@@ -26,6 +26,9 @@ public class EfectoMaquinaDeEscribir : MonoBehaviour
     private int indiceActual = 0;
     private bool estaEscribiendo = false;
     private Coroutine corrutinaEscritura;
+
+    
+    private bool cambiandoEscena = false;
 
     void Start()
     {
@@ -38,7 +41,6 @@ public class EfectoMaquinaDeEscribir : MonoBehaviour
             grupoBotonEscena.blocksRaycasts = false;
         }
 
-        
         if (pantallaNegra != null)
         {
             pantallaNegra.alpha = 0;
@@ -59,6 +61,7 @@ public class EfectoMaquinaDeEscribir : MonoBehaviour
     public void EmpezarDialogo()
     {
         indiceActual = 0;
+        cambiandoEscena = false; 
 
         if (corrutinaEscritura != null)
         {
@@ -90,13 +93,20 @@ public class EfectoMaquinaDeEscribir : MonoBehaviour
 
     public void AvanzarOSaltarDialogo()
     {
+        if (cambiandoEscena) return;
+
+        if (AudioManager.instancia != null)
+        {
+            AudioManager.instancia.DetenerDialogo();
+        }
+
         if (estaEscribiendo)
         {
             if (corrutinaEscritura != null)
             {
                 StopCoroutine(corrutinaEscritura);
             }
-            AudioManager.instancia.DetenerDialogo();
+
             textoDialogo.maxVisibleCharacters = textoDialogo.textInfo.characterCount;
             estaEscribiendo = false;
             MostrarBotonesFinales();
@@ -105,6 +115,10 @@ public class EfectoMaquinaDeEscribir : MonoBehaviour
         {
             indiceActual++;
             corrutinaEscritura = StartCoroutine(EscribirTexto());
+        }
+        else
+        {
+            CargarSiguienteEscena();
         }
     }
 
@@ -122,6 +136,8 @@ public class EfectoMaquinaDeEscribir : MonoBehaviour
 
     IEnumerator AparecerBotonEscena()
     {
+        if (grupoBotonEscena == null) yield break;
+
         grupoBotonEscena.gameObject.SetActive(true);
         grupoBotonEscena.interactable = true;
         grupoBotonEscena.blocksRaycasts = true;
@@ -133,37 +149,34 @@ public class EfectoMaquinaDeEscribir : MonoBehaviour
         }
     }
 
-    
     public void CargarSiguienteEscena()
     {
         
+        if (cambiandoEscena) return;
+        cambiandoEscena = true;
+
         if (pantallaNegra != null)
         {
             StartCoroutine(TransicionYCambioDeEscena());
         }
         else
         {
-            
             SceneManager.LoadScene(nombreEscenaACargar);
         }
     }
 
     IEnumerator TransicionYCambioDeEscena()
     {
-        
         pantallaNegra.blocksRaycasts = true;
 
-        
         while (pantallaNegra.alpha < 1)
         {
             pantallaNegra.alpha += Time.deltaTime * velocidadTransicion;
             yield return null;
         }
 
-        
         yield return new WaitForSeconds(0.5f);
 
-       
         SceneManager.LoadScene(nombreEscenaACargar);
     }
 }

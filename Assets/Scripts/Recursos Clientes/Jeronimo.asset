@@ -18,7 +18,7 @@ MonoBehaviour:
   dinero: 15
   spriteIndex: 1
   frasePedido: "Che, \xBFme das por favor [producto] , es que tengo siete cafeteras
-    en casa"
+    en casa. te pago m\xE1s..."
   opcion1: Raro, pero toma.
   opcion2: "Llamar\xE9 a la polic\xEDa."
   respuesta1: "\xA1Sos un crack!"

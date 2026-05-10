@@ -46,14 +46,13 @@ public class EfectoFinDeDia : MonoBehaviour
 
         if (GameManager.Instance != null)
         {
-            // Corregido: dia -> Dia
+     
             if (textoTituloResumen != null)
                 textoTituloResumen.text = "RESUMEN DEL DIA " + GameManager.Instance.Dia;
 
-            // Corregido: amonestaciones -> Amonestaciones, maxAmonestaciones -> MaxAmonestaciones
-            textoDelResumen = "Dinero ganado hoy: $" + GameManager.Instance.ObtenerDineroGanadoEnElDia() +
-                              "\n\nFaltas del gobierno: " + GameManager.Instance.Amonestaciones + " / " + GameManager.Instance.MaxAmonestaciones;
 
+            textoDelResumen = "Dinero ganado hoy: $" + GameManager.Instance.DineroGanadoEnElDia +
+                    "\n\nFaltas del gobierno: " + GameManager.Instance.Amonestaciones + " / " + GameManager.Instance.MaxAmonestaciones;
             ActualizarTextosTienda();
         }
         else
@@ -161,14 +160,14 @@ public class EfectoFinDeDia : MonoBehaviour
     {
         if (GameManager.Instance == null) return;
 
-        // Corregido: dinero -> Dinero
+        
         if (textoSaldoTotal != null)
             textoSaldoTotal.text = "TU SALDO ACTUAL: $" + GameManager.Instance.Dinero;
 
         Inventario inv = GameManager.Instance.ObtenerInventario();
         if (inv != null)
         {
-            // Corregidos: costoCompra... -> CostoCompra...
+            
             if (infoPan != null)
                 infoPan.text = "Stock de pan: " + inv.ObtenerProducto("pan").Cantidad + " | Precio: $" + GameManager.Instance.CostoCompraPan;
 
@@ -182,7 +181,7 @@ public class EfectoFinDeDia : MonoBehaviour
 
     public void ComprarPan()
     {
-        // Corregido: costoCompraPan -> CostoCompraPan
+        
         if (GameManager.Instance.ComprarArticulo("pan", GameManager.Instance.CostoCompraPan))
         {
             if (audioSourceEfectos != null && sonidoComprar != null) audioSourceEfectos.PlayOneShot(sonidoComprar);
@@ -197,7 +196,7 @@ public class EfectoFinDeDia : MonoBehaviour
 
     public void ComprarLeche()
     {
-        // Corregido: costoCompraLeche -> CostoCompraLeche
+        
         if (GameManager.Instance.ComprarArticulo("leche", GameManager.Instance.CostoCompraLeche))
         {
             if (audioSourceEfectos != null && sonidoComprar != null) audioSourceEfectos.PlayOneShot(sonidoComprar);
@@ -212,7 +211,7 @@ public class EfectoFinDeDia : MonoBehaviour
 
     public void ComprarHuevos()
     {
-        // Corregido: costoCompraHuevos -> CostoCompraHuevos
+        
         if (GameManager.Instance.ComprarArticulo("huevos", GameManager.Instance.CostoCompraHuevos))
         {
             if (audioSourceEfectos != null && sonidoComprar != null) audioSourceEfectos.PlayOneShot(sonidoComprar);

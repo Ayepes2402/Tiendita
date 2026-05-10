@@ -68,7 +68,7 @@ public class EfectoDialogo : MonoBehaviour
     {
         switch (d)
         {
-            case 1: return "Hoy las vacas se fueron de paseo y no hay leche. No vendas, ¡hay escasez!";
+            case 1: return "Hoy las vacas se fueron de paseo y no hay leche. No vendas, ¡hay escasez! Recuerda usar el almacen para vender";
             case 2: return "Las gallinas han entrado en huelga. PROHIBIDO vender huevos hasta nuevo aviso.";
             case 3: return "El trigo se ha quemado. El PAN es ahora un artículo de lujo ilegal.";
             case 4: return "Crisis total: No hay LECHE ni HUEVOS. La policía está vigilando.";

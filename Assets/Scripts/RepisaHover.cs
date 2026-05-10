@@ -7,10 +7,10 @@ public class RepisaHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public RectTransform repisaRect;
 
     [Tooltip("Posición en X cuando está abierta (ej: 0)")]
-    public float posicionAbierta = 0f;
+    public float posicionAbierta = -800f;
 
     [Tooltip("Posición en X cuando está escondida (ej: -200)")]
-    public float posicionCerrada = -200f;
+    public float posicionCerrada = -1029f;
 
     [Tooltip("Qué tan rápido sale y se esconde")]
     public float velocidad = 10f;

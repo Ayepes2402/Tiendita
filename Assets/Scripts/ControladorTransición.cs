@@ -20,12 +20,12 @@ public class ControladorTransicion : MonoBehaviour
 
         if (GameManager.Instance != null)
         {
-            // Corregido: dia -> Dia
+          
             int proximoDia = GameManager.Instance.Dia + 1;
 
-            textoTituloDiaSiguiente.text = "DÍA " + proximoDia;
+            textoTituloDiaSiguiente.text = "DIA " + proximoDia;
 
-            // Corregido: Todas las propiedades ahora inician con Mayúscula
+         
             textoResumenDinero.text =
                 "Dinero actual: $" + GameManager.Instance.Dinero +
                 "\nCuota Pendiente: $" + GameManager.Instance.Deuda +
@@ -71,7 +71,7 @@ public class ControladorTransicion : MonoBehaviour
             case 2: return "Las gallinas han formado un sindicato... PROHIBIDO vender HUEVOS.";
             case 3: return "Desastre en el molino... PROHIBIDO vender PAN.";
             case 4: return "¡Crisis nacional!... PROHIBIDO vender LECHE y HUEVOS.";
-            case 5: return "Último día... PROHIBIDO vender HUEVOS y PAN. ¡Paga tu deuda!";
+            case 5: return "Último dISa... PROHIBIDO vender HUEVOS y PAN. ¡Paga tu deuda!";
             default: return "Sigue las normas del gobierno.";
         }
     }

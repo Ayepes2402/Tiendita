@@ -1,46 +1,47 @@
+using System; // Necesario para el Action (Patrón Observador)
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-  
+    // SINGLETON 
     public static GameManager Instance { get; private set; }
 
-    [Header("Referencias")]
+    // OBSERVADOR 
+ 
+    public static event Action OnDatosActualizados;
+
+    [Header("Configuración y Referencias")]
     [SerializeField] private ClienteGenerator generador;
-    private UIManager uiManager;
+    [SerializeField] private int diasMaximos = 5;
+    [SerializeField] private int dineroInicial = 1500;
+    [SerializeField] private int metaMinimaDiaria = 20;
+
+
     private Inventario inventario;
     private VentaService ventaService;
     private ReglaGobierno reglaDelDia;
-
-   
     private List<ClienteData> clientesDelDia;
     private ClienteData clienteActual;
-
     private int indiceClienteActualDelDia;
     private int clientesAtendidosHoy;
     private string eventoDelDiaActual = "";
+    private string ultimoMensajeEvento = "";
 
-
+   
     public int Dinero { get; private set; }
     public int Dia { get; private set; }
     public int Amonestaciones { get; private set; }
+    public bool JuegoTerminado { get; private set; } = false;
+    public int DineroGanadoEnElDia { get; private set; } = 0;
 
-   
+ 
     public int Deuda { get; private set; } = 6500;
     public int MaxAmonestaciones { get; private set; } = 3;
     public int CostoCompraPan { get; private set; } = 300;
     public int CostoCompraLeche { get; private set; } = 500;
     public int CostoCompraHuevos { get; private set; } = 400;
-
-    private int diasMaximos = 5;
-    private int dineroInicial = 1500;
-    private int metaMinimaDiaria = 20;
-
-    public bool juegoTerminado = false;
-    public string ultimoMensajeEvento = "";
-    public int dineroGanadoEnElDia = 0;
 
     private void Awake()
     {
@@ -60,45 +61,27 @@ public class GameManager : MonoBehaviour
     private void InicializarComponentesBase()
     {
         inventario = new Inventario(new List<Producto> {
-       
-        new Producto("pan", 600, 5, CategoriaProducto.Basico),
-        new Producto("leche", 800, 5, CategoriaProducto.Lacteo), 
-        new Producto("huevos", 1000, 5, CategoriaProducto.Proteina)
-    });
+            new Producto("pan", 600, 5, CategoriaProducto.Basico),
+            new Producto("leche", 800, 5, CategoriaProducto.Lacteo),
+            new Producto("huevos", 1000, 5, CategoriaProducto.Proteina)
+        });
 
         ventaService = new VentaService(inventario);
-
         Dinero = dineroInicial;
         Dia = 0;
-        juegoTerminado = false;
+        JuegoTerminado = false;
     }
 
-    void OnEnable()
-    {
-        if (Instance == this) SceneManager.sceneLoaded += AlCargarEscena;
-    }
-
-    void OnDisable()
-    {
-        if (Instance == this) SceneManager.sceneLoaded -= AlCargarEscena;
-    }
+    private void OnEnable() => SceneManager.sceneLoaded += AlCargarEscena;
+    private void OnDisable() => SceneManager.sceneLoaded -= AlCargarEscena;
 
     private void AlCargarEscena(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "Escena_Tienda")
         {
-            uiManager = FindObjectOfType<UIManager>(); 
-        
-        
-        if (generador == null)
-            {
-                generador = FindObjectOfType<ClienteGenerator>(); 
-        }
-
-            if (uiManager != null)
-            {
-                PrepararDia(Dia); 
-        }
+           
+            if (generador == null) generador = FindObjectOfType<ClienteGenerator>();
+            PrepararDia(Dia);
         }
     }
 
@@ -108,11 +91,11 @@ public class GameManager : MonoBehaviour
         clientesAtendidosHoy = 0;
         indiceClienteActualDelDia = 0;
         Amonestaciones = 0;
-        dineroGanadoEnElDia = 0;
+        DineroGanadoEnElDia = 0;
 
         List<string> prohibidos = new List<string>();
 
-       
+        
         if (Dia == 1) prohibidos.Add("leche");
         else if (Dia == 2) prohibidos.Add("huevos");
         else if (Dia == 3) prohibidos.Add("pan");
@@ -122,47 +105,17 @@ public class GameManager : MonoBehaviour
         reglaDelDia = new ReglaGobierno(prohibidos);
         eventoDelDiaActual = "PROHIBIDO: " + reglaDelDia.ObtenerListaProhibida().ToUpper();
 
-    
         if (generador != null)
-        {
             clientesDelDia = generador.ObtenerClientesDelDia(Dia);
-        }
-        else
-        {
-            Debug.LogError("Falta asignar el GeneradorClientes en el Inspector.");
-        }
 
-        if (uiManager != null)
-        {
-            uiManager.ActualizarUI();
-            uiManager.MostrarAvisoDia("Día " + Dia + ". " + eventoDelDiaActual);
-        }
+    
+        NotificarCambios();
         MostrarClienteActual();
     }
 
-
-    private string ObtenerProductoRealDelCliente()
-    {
-        string productoPedido = clienteActual.ProductoPedido;
-
-       
-        if (productoPedido == "trampa")
-        {
-            if (Dia == 1) productoPedido = "leche";
-            else if (Dia == 2) productoPedido = "huevos";
-            else if (Dia == 3) productoPedido = "pan";
-            else if (Dia == 4) productoPedido = "leche"; 
-            else if (Dia >= 5) productoPedido = "huevos"; 
-        }
-
-        return productoPedido;
-    }
-
-  
-
     public void IntentarVender(string productoEntregado)
     {
-        if (juegoTerminado || clienteActual == null) return;
+        if (JuegoTerminado || clienteActual == null) return;
 
         string productoQueQuiere = ObtenerProductoRealDelCliente();
 
@@ -172,67 +125,47 @@ public class GameManager : MonoBehaviour
         }
         else if (!reglaDelDia.PuedeVender(productoEntregado))
         {
-           
             Cliente clienteTemp = new Cliente(clienteActual.Nombre, clienteActual.Tipo, productoEntregado, clienteActual.Dinero, "", 0);
-
             if (ventaService.RealizarVenta(clienteTemp))
             {
                 int precioBase = inventario.ObtenerProducto(productoEntregado).Precio;
-                int pagoFinal = precioBase;
+                int pagoFinal = (clienteActual.Tipo == TipoCliente.Sospechoso) ? precioBase * 2 : precioBase;
 
-                
-                if (clienteActual.Tipo == TipoCliente.Sospechoso)
-                {
-                    pagoFinal *= 2;
-                    ultimoMensajeEvento = "¡Venta ilegal de alto riesgo! Pago doble.";
-                }
-                else
-                {
-                    ultimoMensajeEvento = "Venta ilegal realizada.";
-                }
+                ultimoMensajeEvento = (clienteActual.Tipo == TipoCliente.Sospechoso) ?
+                    "¡Venta ilegal de alto riesgo! Pago doble." : "Venta ilegal realizada.";
 
                 Dinero += pagoFinal;
-                dineroGanadoEnElDia += pagoFinal;
-
-                if (uiManager != null) uiManager.MostrarGanancia(pagoFinal);
+                DineroGanadoEnElDia += pagoFinal;
                 SumarAmonestacion(ultimoMensajeEvento, 0);
+
+                FindObjectOfType<UIManager>()?.MostrarGanancia(pagoFinal);
             }
-            else ultimoMensajeEvento = "Sin stock.";
         }
         else
         {
-           
             Cliente clienteTemp = new Cliente(clienteActual.Nombre, clienteActual.Tipo, productoEntregado, clienteActual.Dinero, "", 0);
             if (ventaService.RealizarVenta(clienteTemp))
             {
                 int precio = inventario.ObtenerProducto(productoEntregado).Precio;
                 Dinero += precio;
-                dineroGanadoEnElDia += precio;
-                if (uiManager != null) uiManager.MostrarGanancia(precio);
+                DineroGanadoEnElDia += precio;
+                UIManager ui = FindObjectOfType<UIManager>();
+                if (ui != null)
+                {
+                    ui.MostrarGanancia(precio); 
+                }
                 ultimoMensajeEvento = "Venta exitosa.";
             }
-            else ultimoMensajeEvento = "Sin stock.";
         }
-        FinalizarTurno();
-        ActualizarContadoresVisuales();
-    }
 
-    private void ActualizarContadoresVisuales()
-    {
-       
-        DragUICategoria[] iconos = FindObjectsOfType<DragUICategoria>();
-        foreach (DragUICategoria icono in iconos)
-        {
-            icono.ActualizarTextoDesdeBackend(); 
-    }
+        FinalizarTurno();
     }
 
     public void BotonRechazar()
     {
-        if (juegoTerminado || clienteActual == null) return;
+        if (JuegoTerminado || clienteActual == null) return;
 
         string productoQueQuiere = ObtenerProductoRealDelCliente();
-
         bool esProhibido = !reglaDelDia.PuedeVender(productoQueQuiere);
         bool sinStock = !inventario.TieneProducto(productoQueQuiere);
 
@@ -247,20 +180,37 @@ public class GameManager : MonoBehaviour
     private void FinalizarTurno()
     {
         clientesAtendidosHoy++;
-        ActualizarUICompleta();
 
-        if (!juegoTerminado)
+        if (!JuegoTerminado)
         {
             indiceClienteActualDelDia++;
             if (indiceClienteActualDelDia < clientesDelDia.Count)
-            {
                 MostrarClienteActual();
-            }
             else
-            {
                 CerrarDiaActual();
-            }
         }
+        NotificarCambios();
+    }
+
+    private void NotificarCambios()
+    {
+        
+        OnDatosActualizados?.Invoke();
+    }
+
+  
+    private string ObtenerProductoRealDelCliente()
+    {
+        if (clienteActual.ProductoPedido != "trampa") return clienteActual.ProductoPedido;
+
+        return Dia switch
+        {
+            1 => "leche",
+            2 => "huevos",
+            3 => "pan",
+            4 => "leche",
+            _ => "huevos"
+        };
     }
 
     private void MostrarClienteActual()
@@ -268,32 +218,18 @@ public class GameManager : MonoBehaviour
         if (indiceClienteActualDelDia < clientesDelDia.Count)
         {
             clienteActual = clientesDelDia[indiceClienteActualDelDia];
-
-            string productoReal = ObtenerProductoRealDelCliente();
-
           
-            if (uiManager != null) uiManager.MostrarCliente(clienteActual, productoReal);
+            FindObjectOfType<UIManager>()?.MostrarCliente(clienteActual, ObtenerProductoRealDelCliente());
         }
     }
 
     private void CerrarDiaActual()
     {
-        if (uiManager != null) uiManager.MostrarCliente(null);
-
         if (Dia >= 5)
         {
-            bool gano = Dinero >= Deuda;
-            if (gano) SceneManager.LoadScene("EscenaGanasteJuego");
-            else
-            {
-                juegoTerminado = true;
-                SceneManager.LoadScene("Escena de Gameover por no pagar la deuda");
-            }
+            SceneManager.LoadScene(Dinero >= Deuda ? "EscenaGanasteJuego" : "Escena de Gameover por no pagar la deuda");
         }
-        else
-        {
-            SceneManager.LoadScene("Escena_FinDeDia");
-        }
+        else SceneManager.LoadScene("Escena_FinDeDia");
     }
 
     public bool ComprarArticulo(string nombreProducto, int costo)
@@ -305,6 +241,7 @@ public class GameManager : MonoBehaviour
             {
                 p.AumentarStock(1);
                 Dinero -= costo;
+                NotificarCambios();
                 return true;
             }
         }
@@ -316,33 +253,29 @@ public class GameManager : MonoBehaviour
         Dia++;
         SceneManager.LoadScene("Escena_Tienda");
     }
-
-    private void SumarAmonestacion(string motivo, int multa)
-    {
-        Amonestaciones++;
-        Dinero -= multa;
-        ultimoMensajeEvento = motivo + " (Faltas: " + Amonestaciones + "/" + MaxAmonestaciones + ")";
-
-        if (Amonestaciones >= MaxAmonestaciones)
-        {
-            juegoTerminado = true;
-            SceneManager.LoadScene("Escena de Gameover por amonestaciones");
-        }
-    }
-
     public void ReiniciarJuego()
     {
         Destroy(gameObject);
         SceneManager.LoadScene("Escena_Tienda");
     }
+    private void SumarAmonestacion(string motivo, int multa)
+    {
+        Amonestaciones++;
+        Dinero -= multa;
+        ultimoMensajeEvento = $"{motivo} (Faltas: {Amonestaciones}/{MaxAmonestaciones})";
 
-    private void ActualizarUICompleta() { if (uiManager != null) uiManager.ActualizarUI(); }
+        if (Amonestaciones >= MaxAmonestaciones)
+        {
+            JuegoTerminado = true;
+            SceneManager.LoadScene("Escena de Gameover por amonestaciones");
+        }
+    }
 
+    
     public string ObtenerUltimoMensajeEvento() => ultimoMensajeEvento;
     public string ObtenerEventoDelDiaActual() => eventoDelDiaActual;
     public int ObtenerMetaMinimaDiaria() => metaMinimaDiaria;
     public int ObtenerClientesAtendidosHoy() => clientesAtendidosHoy;
-    public int ObtenerClientesPorDia() => clientesDelDia != null ? clientesDelDia.Count : 5;
+    public int ObtenerClientesPorDia() => clientesDelDia?.Count ?? 5;
     public Inventario ObtenerInventario() => inventario;
-    public int ObtenerDineroGanadoEnElDia() => dineroGanadoEnElDia;
 }

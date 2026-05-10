@@ -22,18 +22,19 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    
     public void ReproducirDialogo(int indiceVoz = 0, float tonoVoz = 1f)
     {
         if (sonidosDialogo.Length == 0) return;
 
-         
         int indexSeguro = indiceVoz % sonidosDialogo.Length;
 
-        audioSource.clip = sonidosDialogo[indexSeguro];
-        audioSource.pitch = tonoVoz;
-        audioSource.loop = true;
-        audioSource.Play();
+        
+        if (!audioSource.isPlaying)
+        {
+            audioSource.clip = sonidosDialogo[indexSeguro];
+            audioSource.pitch = tonoVoz;
+            audioSource.Play();
+        }
     }
 
     public void DetenerDialogo()

@@ -7,47 +7,47 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     [Header("Referencias UI Generales")]
-    public TextMeshProUGUI textoDinero;
-    public TextMeshProUGUI textoDia;
-    public TextMeshProUGUI textoInventario;
-    public TextMeshProUGUI textoEstado;
-    public TextMeshProUGUI textoAmonestaciones;
-    public TextMeshProUGUI textoMetaDiaria;
-    public TextMeshProUGUI textoEventoDelDia;
-    public TextMeshProUGUI textoAvisoDia;
+    [SerializeField] private TextMeshProUGUI textoDinero;
+    [SerializeField] private TextMeshProUGUI textoDia;
+    [SerializeField] private TextMeshProUGUI textoInventario;
+    [SerializeField] private TextMeshProUGUI textoEstado;
+    [SerializeField] private TextMeshProUGUI textoAmonestaciones;
+    [SerializeField] private TextMeshProUGUI textoMetaDiaria;
+    [SerializeField] private TextMeshProUGUI textoEventoDelDia;
+    [SerializeField] private TextMeshProUGUI textoAvisoDia;
 
     [Header("Paneles de Fin de Juego")]
-    public GameObject panelGameOver;
-    public TextMeshProUGUI textoGameOver;
+    [SerializeField] private GameObject panelGameOver;
+    [SerializeField] private TextMeshProUGUI textoGameOver;
 
     [Header("Ajustes y Menú Pausa")]
-    public GameObject panelAjustes;
-    public Slider sliderVolumen;
+    [SerializeField] private GameObject panelAjustes;
+    [SerializeField] private Slider sliderVolumen;
 
     [Header("Sonidos UI")]
-    public AudioSource audioSourceMusica;
-    public AudioSource audioSourceEfectos;
-    public AudioClip sonidoClick;
-    public AudioClip sonidoGanarPlata;
+    [SerializeField] private AudioSource audioSourceMusica;
+    [SerializeField] private AudioSource audioSourceEfectos;
+    [SerializeField] private AudioClip sonidoClick;
+    [SerializeField] private AudioClip sonidoGanarPlata;
 
     [Header("Referencias del Cliente")]
-    public TextMeshProUGUI textoCliente;
-    public GameObject burbujaDialogo;
-    public Image imagenCliente;
-    public Sprite[] spritesClientes;
+    [SerializeField] private TextMeshProUGUI textoCliente;
+    [SerializeField] private GameObject burbujaDialogo;
+    [SerializeField] private Image imagenCliente;
+    [SerializeField] private Sprite[] spritesClientes;
 
     [Header("Opciones de Diálogo")]
-    public GameObject panelOpciones;
-    public TextMeshProUGUI textoBotonOpcion1;
-    public TextMeshProUGUI textoBotonOpcion2;
+    [SerializeField] private GameObject panelOpciones;
+    [SerializeField] private TextMeshProUGUI textoBotonOpcion1;
+    [SerializeField] private TextMeshProUGUI textoBotonOpcion2;
 
     [Header("Animación de Clientes")]
-    public float tiempoEsperaEntrada = 0.4f;
-    public float velocidadTransicion = 6f;
-    public float distanciaVertical = 600f;
+    [SerializeField] private float tiempoEsperaEntrada = 0.4f;
+    [SerializeField] private float velocidadTransicion = 6f;
+    [SerializeField] private float distanciaVertical = 600f;
 
     [Header("Animación de Textos")]
-    public float velocidadEscrituraTexto = 0.03f;
+    [SerializeField] private float velocidadEscrituraTexto = 0.03f;
 
     private RectTransform rectCliente;
     private Vector2 posicionOriginalCliente;
@@ -57,13 +57,24 @@ public class UIManager : MonoBehaviour
     private ClienteData clienteActualUI;
 
     [Header("Efectos Visuales")]
-    public GameObject prefabTextoGanancia;
-    public Transform puntoAparicionGanancia;
-
+    [SerializeField] private GameObject prefabTextoGanancia;
+    [SerializeField] private Transform puntoAparicionGanancia;
 
     [Header("Referencias de la Repisa")]
-    public RepisaHover scriptRepisa;
+    [SerializeField] private RepisaHover scriptRepisa;
 
+    
+    private void OnEnable()
+    {
+       
+        GameManager.OnDatosActualizados += ActualizarUI;
+    }
+
+    private void OnDisable()
+    {
+        
+        GameManager.OnDatosActualizados -= ActualizarUI;
+    }
 
     void Awake()
     {
@@ -128,43 +139,39 @@ public class UIManager : MonoBehaviour
 
     public void MostrarCliente(ClienteData cliente, string productoReal = "")
     {
-        clienteActualUI = cliente; 
-    string frase = cliente != null ? cliente.FrasePedido : ""; 
+        clienteActualUI = cliente;
+        string frase = cliente != null ? cliente.FrasePedido : "";
 
-    if (!string.IsNullOrEmpty(productoReal) && cliente != null)
+        if (!string.IsNullOrEmpty(productoReal) && cliente != null)
         {
-            frase = frase.Replace("[producto]", productoReal); 
-    }
-
-        
-        if (scriptRepisa != null)
-        {
-            scriptRepisa.enabled = false;
+            frase = frase.Replace("[producto]", productoReal);
         }
 
-        string textoAColocar = (cliente == null) ? "" : frase + "\""; 
+        if (scriptRepisa != null) scriptRepisa.enabled = false;
 
-    if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo(); 
-    if (corrutinaTextoCliente != null) StopCoroutine(corrutinaTextoCliente); 
-    if (textoCliente != null) textoCliente.text = ""; 
+        string textoAColocar = (cliente == null) ? "" : frase + "\"";
 
-    if (burbujaDialogo != null) burbujaDialogo.SetActive(false); 
-    if (panelOpciones != null) panelOpciones.SetActive(false); 
+        if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
+        if (corrutinaTextoCliente != null) StopCoroutine(corrutinaTextoCliente);
+        if (textoCliente != null) textoCliente.text = "";
 
-    if (imagenCliente != null)
+        if (burbujaDialogo != null) burbujaDialogo.SetActive(false);
+        if (panelOpciones != null) panelOpciones.SetActive(false);
+
+        if (imagenCliente != null)
         {
-            if (animacionActual != null) StopCoroutine(animacionActual); 
+            if (animacionActual != null) StopCoroutine(animacionActual);
 
-        if (cliente != null && spritesClientes != null &&
-            cliente.SpriteIndex >= 0 && cliente.SpriteIndex < spritesClientes.Length)
+            if (cliente != null && spritesClientes != null &&
+                cliente.SpriteIndex >= 0 && cliente.SpriteIndex < spritesClientes.Length)
             {
-                Sprite nuevoSprite = spritesClientes[cliente.SpriteIndex]; 
-            animacionActual = StartCoroutine(RutinaCambioCliente(nuevoSprite, textoAColocar)); 
-        }
+                Sprite nuevoSprite = spritesClientes[cliente.SpriteIndex];
+                animacionActual = StartCoroutine(RutinaCambioCliente(nuevoSprite, textoAColocar));
+            }
             else
             {
-                animacionActual = StartCoroutine(RutinaSalidaCliente()); 
-        }
+                animacionActual = StartCoroutine(RutinaSalidaCliente());
+            }
         }
     }
 
@@ -220,6 +227,7 @@ public class UIManager : MonoBehaviour
         imagenCliente.enabled = false;
     }
 
+    
     IEnumerator RutinaEscribirDialogo(string mensaje, bool mostrarOpcionesAlFinal)
     {
         float tonoDeVoz = 1f;
@@ -231,16 +239,23 @@ public class UIManager : MonoBehaviour
             indiceDeVozDelCliente = clienteActualUI.SpriteIndex;
         }
 
-        if (AudioManager.instancia != null) AudioManager.instancia.ReproducirDialogo(indiceDeVozDelCliente, tonoDeVoz);
-
         textoCliente.text = mensaje;
         textoCliente.maxVisibleCharacters = 0;
         textoCliente.ForceMeshUpdate();
 
         int totalCaracteres = textoCliente.textInfo.characterCount;
+
         for (int i = 0; i <= totalCaracteres; i++)
         {
             textoCliente.maxVisibleCharacters = i;
+
+          
+            if (i > 0 && i <= mensaje.Length && mensaje[i - 1] != ' ')
+            {
+                if (AudioManager.instancia != null)
+                    AudioManager.instancia.ReproducirDialogo(indiceDeVozDelCliente, tonoDeVoz);
+            }
+
             yield return new WaitForSeconds(velocidadEscrituraTexto);
         }
 
@@ -257,18 +272,18 @@ public class UIManager : MonoBehaviour
 
     public void ClickEnOpcion1()
     {
-        ReproducirClick(); 
-    if (panelOpciones != null) panelOpciones.SetActive(false); 
+        ReproducirClick();
+        if (panelOpciones != null) panelOpciones.SetActive(false);
 
-   
-    if (scriptRepisa != null)
-        {
-            scriptRepisa.enabled = true;
-        }
+        if (scriptRepisa != null) scriptRepisa.enabled = true;
 
-        if (corrutinaTextoCliente != null) StopCoroutine(corrutinaTextoCliente); 
-    corrutinaTextoCliente = StartCoroutine(RutinaEscribirDialogo(clienteActualUI.Respuesta1 + "\"", false)); 
-}
+        if (corrutinaTextoCliente != null) StopCoroutine(corrutinaTextoCliente);
+
+        
+        if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
+
+        corrutinaTextoCliente = StartCoroutine(RutinaEscribirDialogo(clienteActualUI.Respuesta1 + "\"", false));
+    }
 
     public void ClickEnOpcion2()
     {
@@ -277,12 +292,22 @@ public class UIManager : MonoBehaviour
         if (AudioManager.instancia != null) AudioManager.instancia.DetenerDialogo();
         if (corrutinaTextoCliente != null) StopCoroutine(corrutinaTextoCliente);
 
+        StartCoroutine(RutinaRechazarCliente());
+    }
+
+
+    private IEnumerator RutinaRechazarCliente()
+    {
+        
+        yield return StartCoroutine(RutinaEscribirDialogo(clienteActualUI.Respuesta2 + "\"", false));
+
+        yield return new WaitForSeconds(1f);
+
+       
         if (GameManager.Instance != null)
         {
             GameManager.Instance.BotonRechazar();
         }
-
-        corrutinaTextoCliente = StartCoroutine(RutinaEscribirDialogo(clienteActualUI.Respuesta2 + "\"", false));
     }
 
     public void ActualizarUI()
@@ -291,11 +316,12 @@ public class UIManager : MonoBehaviour
 
         if (textoDinero != null) textoDinero.text = "" + GameManager.Instance.Dinero;
         if (textoDia != null) textoDia.text = "Día: " + GameManager.Instance.Dia;
-        if (textoAmonestaciones != null) textoAmonestaciones.text = GameManager.Instance.Amonestaciones + "/3";
+        if (textoAmonestaciones != null) textoAmonestaciones.text = GameManager.Instance.Amonestaciones + "/" + GameManager.Instance.MaxAmonestaciones;
 
         if (textoMetaDiaria != null)
         {
-            textoMetaDiaria.text = "Meta diaria: $" + GameManager.Instance.ObtenerDineroGanadoEnElDia() + "/$" + GameManager.Instance.ObtenerMetaMinimaDiaria() + " | Clientes: " + GameManager.Instance.ObtenerClientesAtendidosHoy() + "/" + GameManager.Instance.ObtenerClientesPorDia();
+            
+            textoMetaDiaria.text = "Meta diaria: $" + GameManager.Instance.DineroGanadoEnElDia + "/$" + GameManager.Instance.ObtenerMetaMinimaDiaria() + " | Clientes: " + GameManager.Instance.ObtenerClientesAtendidosHoy() + "/" + GameManager.Instance.ObtenerClientesPorDia();
         }
 
         MostrarEstado(GameManager.Instance.ObtenerUltimoMensajeEvento());
