@@ -1,4 +1,4 @@
-using System; // Necesario para el Action (Patrón Observador)
+using System; 
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
