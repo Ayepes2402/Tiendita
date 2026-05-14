@@ -1,201 +1,187 @@
-//using System.Collections;
-//using System.Collections.Generic;
-//using NUnit.Framework;
-//using UnityEngine;
+using System.Collections.Generic;
+using NUnit.Framework;
+using UnityEngine;
 
-//public class EditModeTesting
-//{
+public class EditModeTesting
+{
+    [Test]
+    public void Producto_CreaValoresBaseYCategoriaPorDefecto()
+    {
+        Producto producto = new Producto("pan", 10, 5);
 
-//    [Test]
-//    public void Producto_HayStock_TrueSiCantidadMayorACero()
-//    {
-//        Producto p = new Producto("pan", 10, 5);
-//        Assert.IsTrue(p.HayStock());
-//    }
+        Assert.AreEqual("pan", producto.Nombre);
+        Assert.AreEqual(10, producto.Precio);
+        Assert.AreEqual(5, producto.Cantidad);
+        Assert.AreEqual(CategoriaProducto.Otro, producto.Categoria);
+    }
 
-//    [Test]
-//    public void Producto_HayStock_FalseSiCantidadCero()
-//    {
-//        Producto p = new Producto("pan", 10, 0);
-//        Assert.IsFalse(p.HayStock());
-//    }
+    [Test]
+    public void Producto_HayStock_ReflejaLaCantidad()
+    {
+        Producto conStock = new Producto("pan", 10, 1);
+        Producto sinStock = new Producto("pan", 10, 0);
 
-//    [Test]
-//    public void Producto_ReducirStock_DisminuyeCantidad()
-//    {
-//        Producto p = new Producto("pan", 10, 5);
-//        p.ReducirStock();
-//        Assert.AreEqual(4, p.Cantidad);
-//    }
+        Assert.IsTrue(conStock.HayStock());
+        Assert.IsFalse(sinStock.HayStock());
+    }
 
-//    [Test]
-//    public void Producto_ReducirStock_NoBajaDeCero()
-//    {
-//        Producto p = new Producto("pan", 10, 0);
-//        p.ReducirStock();
-//        Assert.AreEqual(0, p.Cantidad);
-//    }
+    [Test]
+    public void Producto_ReducirStock_NoBajaDeCero()
+    {
+        Producto producto = new Producto("pan", 10, 1);
 
-//    [Test]
-//    public void Inventario_TieneProducto_TrueSiExisteYHayStock()
-//    {
-//        List<Producto> lista = new List<Producto>()
-//        {
-//            new Producto("pan",10,5)
-//        };
+        producto.ReducirStock();
+        producto.ReducirStock();
 
-//        Inventario inv = new Inventario(lista);
+        Assert.AreEqual(0, producto.Cantidad);
+    }
 
-//        Assert.IsTrue(inv.TieneProducto("pan"));
-//    }
+    [Test]
+    public void Producto_AumentarStock_SumaCantidad()
+    {
+        Producto producto = new Producto("pan", 10, 3);
 
-//    [Test]
-//    public void Inventario_TieneProducto_FalseSiNoExiste()
-//    {
-//        List<Producto> lista = new List<Producto>()
-//        {
-//            new Producto("pan",10,5)
-//        };
+        producto.AumentarStock(4);
 
-//        Inventario inv = new Inventario(lista);
+        Assert.AreEqual(7, producto.Cantidad);
+    }
 
-//        Assert.IsFalse(inv.TieneProducto("leche"));
-//    }
+    [Test]
+    public void Producto_EsDeCategoria_ComparaCorrectamente()
+    {
+        Producto producto = new Producto("leche", 15, 2, CategoriaProducto.Lacteo);
 
-//    [Test]
-//    public void Inventario_TieneProducto_FalseSiSinStock()
-//    {
-//        List<Producto> lista = new List<Producto>()
-//        {
-//            new Producto("pan",10,0)
-//        };
+        Assert.IsTrue(producto.EsDeCategoria(CategoriaProducto.Lacteo));
+        Assert.IsFalse(producto.EsDeCategoria(CategoriaProducto.Basico));
+    }
 
-//        Inventario inv = new Inventario(lista);
+    [Test]
+    public void Inventario_TieneProducto_SoloSiExisteYHayStock()
+    {
+        List<Producto> productos = new List<Producto>
+        {
+            new Producto("pan", 10, 3),
+            new Producto("leche", 12, 0)
+        };
 
-//        Assert.IsFalse(inv.TieneProducto("pan"));
-//    }
+        Inventario inventario = new Inventario(productos);
 
-//    [Test]
-//    public void Inventario_ObtenerProducto_RetornaCorrecto()
-//    {
-//        Producto prod = new Producto("pan", 10, 5);
+        Assert.IsTrue(inventario.TieneProducto("pan"));
+        Assert.IsFalse(inventario.TieneProducto("leche"));
+        Assert.IsFalse(inventario.TieneProducto("huevos"));
+    }
 
-//        List<Producto> lista = new List<Producto>() { prod };
+    [Test]
+    public void Inventario_ObtenerProducto_RetornaNullSiNoExiste()
+    {
+        Inventario inventario = new Inventario(new List<Producto>());
 
-//        Inventario inv = new Inventario(lista);
+        Assert.IsNull(inventario.ObtenerProducto("pan"));
+    }
 
-//        Assert.AreEqual(prod, inv.ObtenerProducto("pan"));
-//    }
+    [Test]
+    public void Inventario_ObtenerProductosPorCategoria_FiltraCorrectamente()
+    {
+        Producto pan = new Producto("pan", 10, 3, CategoriaProducto.Basico);
+        Producto leche = new Producto("leche", 12, 2, CategoriaProducto.Lacteo);
+        Producto queso = new Producto("queso", 18, 1, CategoriaProducto.Lacteo);
+        Inventario inventario = new Inventario(new List<Producto> { pan, leche, queso });
 
-//    [Test]
-//    public void Inventario_ObtenerProducto_RetornaNullSiNoExiste()
-//    {
-//        Inventario inv = new Inventario(new List<Producto>());
+        List<Producto> lacteos = inventario.ObtenerProductosPorCategoria(CategoriaProducto.Lacteo);
 
-//        Assert.IsNull(inv.ObtenerProducto("pan"));
-//    }
+        Assert.AreEqual(2, lacteos.Count);
+        Assert.Contains(leche, lacteos);
+        Assert.Contains(queso, lacteos);
+        Assert.IsFalse(lacteos.Contains(pan));
+    }
 
+    [Test]
+    public void Inventario_TieneProductosEnCategoria_RespetaElStock()
+    {
+        Inventario inventario = new Inventario(new List<Producto>
+        {
+            new Producto("pan", 10, 0, CategoriaProducto.Basico),
+            new Producto("leche", 12, 2, CategoriaProducto.Lacteo)
+        });
 
-//    [Test]
-//    public void Cliente_SeCreaCorrectamente()
-//    {
-//        Cliente c = new Cliente(TipoCliente.Normal, "pan", 20);
+        Assert.IsFalse(inventario.TieneProductosEnCategoria(CategoriaProducto.Basico));
+        Assert.IsTrue(inventario.TieneProductosEnCategoria(CategoriaProducto.Lacteo));
+    }
 
-//        Assert.AreEqual("pan", c.ProductoPedido);
-//        Assert.AreEqual(20, c.Dinero);
-//        Assert.AreEqual(TipoCliente.Normal, c.Tipo);
-//    }
+    [Test]
+    public void VentaService_RealizarVenta_ReduceStockCuandoHayProducto()
+    {
+        Producto producto = new Producto("pan", 10, 2);
+        Inventario inventario = new Inventario(new List<Producto> { producto });
+        VentaService ventaService = new VentaService(inventario);
+        Cliente cliente = new Cliente(TipoCliente.Normal, "pan", 20);
 
+        bool resultado = ventaService.RealizarVenta(cliente);
 
-//    [Test]
-//    public void VentaService_VentaExitosa()
-//    {
-//        Producto p = new Producto("pan", 10, 5);
-//        Inventario inv = new Inventario(new List<Producto>() { p });
-//        VentaService vs = new VentaService(inv);
+        Assert.IsTrue(resultado);
+        Assert.AreEqual(1, producto.Cantidad);
+    }
 
-//        Cliente c = new Cliente(TipoCliente.Normal, "pan", 20);
+    [Test]
+    public void VentaService_RealizarVenta_FalseSiNoExisteProducto()
+    {
+        Inventario inventario = new Inventario(new List<Producto>());
+        VentaService ventaService = new VentaService(inventario);
+        Cliente cliente = new Cliente(TipoCliente.Normal, "pan", 20);
 
-//        bool resultado = vs.RealizarVenta(c);
+        Assert.IsFalse(ventaService.RealizarVenta(cliente));
+    }
 
-//        Assert.IsTrue(resultado);
-//        Assert.AreEqual(4, p.Cantidad);
-//    }
+    [Test]
+    public void ReglaGobierno_PuedeVender_RespetaListaProhibida()
+    {
+        ReglaGobierno regla = new ReglaGobierno(new List<string> { "pan", "leche" });
 
-//    [Test]
-//    public void VentaService_FallaSiNoHayProducto()
-//    {
-//        Inventario inv = new Inventario(new List<Producto>());
-//        VentaService vs = new VentaService(inv);
+        Assert.IsFalse(regla.PuedeVender("pan"));
+        Assert.IsFalse(regla.PuedeVender("PAN"));
+        Assert.IsTrue(regla.PuedeVender("huevos"));
+    }
 
-//        Cliente c = new Cliente(TipoCliente.Normal, "pan", 20);
+    [Test]
+    public void ReglaGobierno_ObtenerListaProhibida_DevuelveTextoEsperado()
+    {
+        ReglaGobierno sinProhibidos = new ReglaGobierno(new List<string>());
+        ReglaGobierno conProhibidos = new ReglaGobierno(new List<string> { "pan", "leche" });
 
-//        Assert.IsFalse(vs.RealizarVenta(c));
-//    }
+        Assert.AreEqual("Nada", sinProhibidos.ObtenerListaProhibida());
+        Assert.AreEqual("pan y leche", conProhibidos.ObtenerListaProhibida());
+    }
 
-//    [Test]
-//    public void VentaService_FallaSiNoHayStock()
-//    {
-//        Producto p = new Producto("pan", 10, 0);
-//        Inventario inv = new Inventario(new List<Producto>() { p });
-//        VentaService vs = new VentaService(inv);
+    [Test]
+    public void EventoAleatorio_GenerarProductoProhibido_RetornaProductoExistenteOAjoVacio()
+    {
+        EventoAleatorio evento = new EventoAleatorio();
+        Inventario inventario = new Inventario(new List<Producto>
+        {
+            new Producto("pan", 10, 1),
+            new Producto("leche", 12, 1),
+            new Producto("huevos", 15, 1)
+        });
 
-//        Cliente c = new Cliente(TipoCliente.Normal, "pan", 20);
+        Random.InitState(1234);
+        string resultado = evento.GenerarProductoProhibido(inventario);
 
-//        Assert.IsFalse(vs.RealizarVenta(c));
-//    }
+        Assert.IsNotEmpty(resultado);
+        Assert.Contains(resultado, new List<string> { "pan", "leche", "huevos" });
+        Assert.AreEqual(string.Empty, evento.GenerarProductoProhibido(null));
+        Assert.AreEqual(string.Empty, evento.GenerarProductoProhibido(new Inventario(new List<Producto>())));
+    }
 
-//    [Test]
-//    public void VentaService_FallaSiNoTieneDinero()
-//    {
-//        Producto p = new Producto("pan", 10, 5);
-//        Inventario inv = new Inventario(new List<Producto>() { p });
-//        VentaService vs = new VentaService(inv);
+    [Test]
+    public void Cliente_CreaValoresCorrectos()
+    {
+        Cliente cliente = new Cliente(TipoCliente.Sospechoso, "leche", 35);
 
-//        Cliente c = new Cliente(TipoCliente.Normal, "pan", 5);
-
-//        Assert.IsFalse(vs.RealizarVenta(c));
-//    }
-
-//    [Test]
-//    public void ReglaGobierno_NoPermiteProductoProhibido()
-//    {
-//        ReglaGobierno regla = new ReglaGobierno("pan");
-
-//        Assert.IsFalse(regla.PuedeVender("pan"));
-//    }
-
-//    [Test]
-//    public void ReglaGobierno_PermiteProductoDiferente()
-//    {
-//        ReglaGobierno regla = new ReglaGobierno("pan");
-
-//        Assert.IsTrue(regla.PuedeVender("leche"));
-//    }
-
-//    [Test]
-//    public void EventoAleatorio_GeneraEventoValido()
-//    {
-//        EventoAleatorio evento = new EventoAleatorio();
-
-//        TipoEvento resultado = evento.GenerarEvento();
-
-//        Assert.IsTrue(
-//            resultado == TipoEvento.Robo ||
-//            resultado == TipoEvento.Propina ||
-//            resultado == TipoEvento.Nada
-//        );
-//    }
-
-//    [Test]
-//    public void ClienteGenerator_GeneraClienteValido()
-//    {
-//        ClienteGenerator gen = new ClienteGenerator();
-
-//        Cliente c = gen.GenerarCliente();
-
-//        Assert.IsNotNull(c);
-//        Assert.IsNotNull(c.ProductoPedido);
-//        Assert.IsTrue(c.Dinero >= 5 && c.Dinero <= 30);
-//    }
-//}
+        Assert.AreEqual("Cliente", cliente.Nombre);
+        Assert.AreEqual(TipoCliente.Sospechoso, cliente.Tipo);
+        Assert.AreEqual("leche", cliente.ProductoPedido);
+        Assert.AreEqual(35, cliente.Dinero);
+        Assert.IsTrue(cliente.FrasePedido.Contains("leche"));
+        Assert.AreEqual(-1, cliente.SpriteIndex);
+    }
+}

@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Configuración y Referencias")]
     [SerializeField] private ClienteGenerator generador;
-    [SerializeField] private int diasMaximos = 5;
+    
     [SerializeField] private int dineroInicial = 1500;
     [SerializeField] private int metaMinimaDiaria = 20;
 
